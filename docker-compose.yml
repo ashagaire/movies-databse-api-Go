@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  api:
+    build: .
+    container_name: open-movies-db-api
+    ports:
+      - "8080:8080"
+    volumes:
+      # Mounting a local folder for persistence
+      - ./data:/app/data
+    environment:
+      - PORT=8080
+      - DB_PATH=/app/data/movies.db
