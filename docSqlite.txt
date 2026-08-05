@@ -1,0 +1,21 @@
+Go application that uses SQLite, you need some SQLite driver.
+
+Common options:
+github.com/mattn/go-sqlite3
+    Most widely used
+    Uses CGO
+    Relies on native SQLite libraries
+
+modernc.org/sqlite
+    Pure Go
+    No CGO required
+    Easier cross-compilation
+
+#CGO is a feature in Go that allows Go programs to call code written in C (and C-compatible languages).   
+Why does CGO exist?
+There are many powerful and mature libraries written in C, for example:
+    SQLite
+    OpenSSL
+    graphics libraries
+    system-level libraries
+Instead of rewriting all those libraries in Go, Go can call them through CGO. 
