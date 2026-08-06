@@ -2,6 +2,7 @@ package database
 
 import (
 	"fmt"
+	"os"
 	"database/sql"
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -18,8 +19,8 @@ func New(dbPath string) (*sql.DB, error) {
 		return nil, fmt.Errorf("failed to ping database: %w", err)
 	}
 
-	fmt.Println(">> PING: Successful!*")
-	fmt.Println("*** Connection Established to SQLite Database! ***")
+	fmt.Println(">> PING: Successful!")
+	fmt.Println(">> Connection to SQLite Established ...")
 	return db, nil
 }
 
@@ -35,7 +36,7 @@ func RunMigration(db *sql.DB, migrationFilePath string) error {
 		return fmt.Errorf("failed to execute migration: %w", err)
 	}
 
-	fmt.Println("Succesfully applied Database Schema!")
+	fmt.Println(">> Database Schema applied Successfully!")
 
 	return nil
 }
