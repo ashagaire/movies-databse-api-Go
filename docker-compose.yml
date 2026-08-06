@@ -1,9 +1,10 @@
 version: '3.8'
 
 services:
-  api:
+  movies-api:
     build: .
-    container_name: open-movies-db-api
+    image: movies-api:latest
+    container_name: movies-api-app
     ports:
       - "8080:8080"
     volumes:
