@@ -4,29 +4,47 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"os"
 
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func FromDb(){
-	db, err := sql.Open("sqlite3", "../../internal/db/test.db")
+func BuildDb(){
+	db, err := sql.Open("sqlite3", "../../internal/db/test.db?_foreign_keys=on")
 	if err != nil {
 		log.Fatal(err)
 
 	}
 	defer db.Close()
-	sqlStmt := `CREATE TABLE IF NOT EXISTS users ( 
-		id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-		name TEXT
-		);`
 	
-	_, err = db.Exec(sqlStmt)
+	
+	_, err = db.Exec(schema)
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Println("Table 'user' created sucessfully")
+	log.Println("Database built sucessfully")
 
-	fmt.Println("from interna db db.go file")
+	//seeding demo data
+	seedFile := "seed.sql"
+	err = seedData(db, seedFile)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println("Database seeded sucessfully")
+}
 
+func seedData(db *sql.DB, seeDFilePath string) error {
+	script, err := os.ReadFile(seeDFilePath)
+	if err != nil {
+		fmt.Println("error in finding file")
+		return err
+	}
+
+	_, err = db.Exec(string(script))
+	if err != nil {
+		fmt.Println("error in seeding data ")
+		return err
+	}
+	return nil
 	
 }
