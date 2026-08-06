@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS movies (
     title TEXT NOT NULL,
     release_year INTEGER NOT NULL,
     duration INTEGER NOT NULL
-    
+
 );
 
 CREATE TABLE IF NOT EXISTS actors (
@@ -27,8 +27,8 @@ CREATE TABLE IF NOT EXISTS movie_genres (
     movie_id INTEGER NOT NULL,
     genre_id INTEGER NOT NULL,
     PRIMARY KEY (movie_id, genre_id),
-    FOREIGN KEY (movie_id) REFERENCES movies(id),
-    FOREIGN KEY (genre_id) REFERENCES genres(id)
+    FOREIGN KEY (movie_id) REFERENCES movies(id) ON DELETE RESTRICT,
+    FOREIGN KEY (genre_id) REFERENCES genres(id) ON DELETE RESTRICT
 
 );
 
@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS movie_actors (
     movie_id INTEGER NOT NULL,
     actor_id INTEGER NOT NULL,
     PRIMARY KEY (movie_id, actor_id),
-    FOREIGN KEY (movie_id) REFERENCES movies(id),
-    FOREIGN KEY (movie_id) REFERENCES actors(id)
+    FOREIGN KEY (movie_id) REFERENCES movies(id) ON DELETE RESTRICT,
+    FOREIGN KEY (movie_id) REFERENCES actors(id) ON DELETE RESTRICT
 
 );
