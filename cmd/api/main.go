@@ -34,7 +34,7 @@ func main() {
 	port := ":8080"
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/health", HealthCheck)
+	mux.HandleFunc("GET /health", HealthCheck)
 
 	fmt.Printf(">> Starting Server ...\n")
 	fmt.Printf(">> URL: http://localhost%s\n", port)
