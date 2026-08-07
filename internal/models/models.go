@@ -1,7 +1,7 @@
 package models
 
 type Genre struct {
-	ID   int64  `json:"id"`
+	ID   int64  `json:"id"` // using int64 for SQLite driver compatibility
 	Name string `json:"name"`
 }
 
