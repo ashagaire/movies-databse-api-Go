@@ -3,9 +3,12 @@ package main
 import (
 	"fmt"
 	"log"
-	"movies-api/internal/database"
 	"net/http"
 	"os"
+
+	"movies-api/internal/database"
+	"movies-api/internal/models"
+	"movies-api/internal/repository"
 )
 
 func main() {
@@ -29,6 +32,22 @@ func main() {
 	err = database.RunMigration(db, migrationPath)
 	if err != nil {
 		log.Fatalf(">> FATAL ERROR: Could not run migration \n%v", err)
+	}
+
+	fmt.Printf(">> TEST: Genre Repository Call...\n")
+	genreRepo := repository.NewGenreRepository(db)
+	
+	newGenre := &models.Genre{
+		Name: "Sci-Fi",
+	}
+
+	fmt.Printf("Initial Value > newGenre: %+v\n", newGenre)
+
+	err = genreRepo.Create(newGenre)
+	if err != nil {
+		log.Printf("Error creating genre: %v\n", err)
+	} else {
+		fmt.Printf("Update Value > newGenre:  %+v\n", newGenre)
 	}
 
 	port := ":8080"
