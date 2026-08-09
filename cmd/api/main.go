@@ -38,7 +38,7 @@ func main() {
 	genreRepo := repository.NewGenreRepository(db)
 	
 	newGenre := &models.Genre{
-		Name: "Sci-Fi",
+		Name: "Horror",
 	}
 
 	fmt.Printf("\n--- Create Method ---\n")
@@ -61,6 +61,39 @@ func main() {
 		for _, g := range allGenres {
 			fmt.Printf(" - ID: %d, Name: %s\n", g.ID, g.Name)
 		}
+	}
+	fmt.Printf("---------------------\n")
+
+	fmt.Printf("\n--- Update Method ---\n")
+	genreToUpdate := &models.Genre{
+		ID:   3,
+		Name: "Horror",
+	}
+	err = genreRepo.Update(genreToUpdate)
+	if err != nil {
+		log.Printf("Error updating genre: %v\n", err)
+	} else {
+		fmt.Println("Successfully updated genre ID'!")
+	}
+
+	fmt.Printf("---------------------\n")
+
+	fmt.Printf("\n--- Delete Method ---\n")
+	err = genreRepo.Delete(3)
+	if err != nil {
+		log.Printf("Error deleting genre: %v\n", err)
+	} else {
+		fmt.Println("Successfully deleted genre ID!")
+	}
+
+	fmt.Printf("---------------------\n")
+
+	fmt.Printf("\n--- Verification Method ---\n")
+	genre, err := genreRepo.GetByID(2)
+	if err != nil {
+		fmt.Printf("Verification: %v\n", err) 
+	} else {
+		fmt.Printf(" - ID: %d, Name: %s\n", genre.ID, genre.Name)
 	}
 	fmt.Printf("---------------------\n")
 
