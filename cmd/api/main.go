@@ -3,9 +3,14 @@ package main
 import (
 	"fmt"
 	"log"
-	"movies-api/internal/database"
 	"net/http"
 	"os"
+
+	"movies-api/internal/database"
+	"movies-api/internal/models"
+	"movies-api/internal/repository"
+	"movies-api/internal/service"
+	"movies-api/internal/handler"
 )
 
 func main() {
@@ -31,10 +36,77 @@ func main() {
 		log.Fatalf(">> FATAL ERROR: Could not run migration \n%v", err)
 	}
 
+	fmt.Printf(">> TEST: Genre Repository Call...\n")
+	genreRepo := repository.NewGenreRepository(db)
+	
+	newGenre := &models.Genre{
+		Name: "Drama",
+	}
+
+	fmt.Printf("\n--- Create Method ---\n")
+	fmt.Printf("Initial Value > newGenre: %+v\n", newGenre)
+
+	err = genreRepo.Create(newGenre)
+	if err != nil {
+		log.Printf("Error creating genre: %v\n", err)
+	} else {
+		fmt.Printf("Update Value > newGenre:  %+v\n", newGenre)
+	}
+	fmt.Printf("---------------------\n")
+	
+	fmt.Printf("\n--- GetAll Method ---\n")
+	allGenres, err := genreRepo.GetAll()
+	if err != nil {
+		log.Printf("Error getting genre: %v\n", err)
+	} else {
+		fmt.Printf("Found %d genres: \n", len(allGenres))
+		for _, g := range allGenres {
+			fmt.Printf(" - ID: %d, Name: %s\n", g.ID, g.Name)
+		}
+	}
+	fmt.Printf("---------------------\n")
+
+	fmt.Printf("\n--- Update Method ---\n")
+	genreToUpdate := &models.Genre{
+		ID:   3,
+		Name: "Horror",
+	}
+	err = genreRepo.Update(genreToUpdate)
+	if err != nil {
+		log.Printf("Error updating genre: %v\n", err)
+	} else {
+		fmt.Println("Successfully updated genre ID'!")
+	}
+
+	fmt.Printf("---------------------\n")
+
+	fmt.Printf("\n--- Delete Method ---\n")
+	err = genreRepo.Delete(3)
+	if err != nil {
+		log.Printf("Error deleting genre: %v\n", err)
+	} else {
+		fmt.Println("Successfully deleted genre ID!")
+	}
+
+	fmt.Printf("---------------------\n")
+
+	fmt.Printf("\n--- Verification Method ---\n")
+	genre, err := genreRepo.GetByID(2)
+	if err != nil {
+		fmt.Printf("Verification: %v\n", err) 
+	} else {
+		fmt.Printf(" - ID: %d, Name: %s\n", genre.ID, genre.Name)
+	}
+	fmt.Printf("---------------------\n")
+
+	genreService := service.NewGenreService(genreRepo)
+	genreHandler := handler.NewGenreHandler(genreService)
+
 	port := ":8080"
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/health", HealthCheck)
+	mux.HandleFunc("GET /health", HealthCheck)
+	mux.HandleFunc("GET /api/genres", genreHandler.GetAll)
 
 	fmt.Printf(">> Starting Server ...\n")
 	fmt.Printf(">> URL: http://localhost%s\n", port)

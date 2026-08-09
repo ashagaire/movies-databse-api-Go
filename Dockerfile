@@ -8,7 +8,7 @@ RUN go mod download
 
 COPY . .
 
-RUN CGO_ENABLED=1 GOOS=linux go build -o open-movies-db ./cmd/api
+RUN CGO_ENABLED=1 GOOS=linux go build -o movies-api ./cmd/api
 
 FROM debian:bookworm-slim
 
@@ -16,10 +16,12 @@ WORKDIR /app
 
 RUN apt-get update && apt-get install -y ca-certificates sqlite3 && rm -rf /var/lib/apt/lists/*
 
-COPY --from=builder /app/open-movies-db .
+COPY --from=builder /app/movies-api .
+
+COPY --from=builder /app/migrations ./migrations
 
 RUN mkdir -p /app/data
 
 EXPOSE 8080
 
-CMD ["./open-movies-db"]
+CMD ["./movies-api"]
