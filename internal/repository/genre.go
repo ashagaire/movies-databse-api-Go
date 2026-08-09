@@ -2,6 +2,7 @@ package repository
 
 import (
 	"fmt"
+	"errors"
 	"database/sql"
 	"movies-api/internal/models"
 )
@@ -75,7 +76,7 @@ func (r *GenreRepository) GetByID(id int64) (*models.Genre, error) {
 
 	query := `SELECT id, name FROM genres WHERE id = ?`
 
-	var g *models.Genre 
+	var g models.Genre 
 
 	err := r.db.QueryRow(query, id).Scan(&g.ID, &g.Name)
 
@@ -111,5 +112,5 @@ func (r *GenreRepository) Delete(id int64) error {
 	}
 
 	return nil
-	
+
 }
