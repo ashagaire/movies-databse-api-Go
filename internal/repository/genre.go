@@ -36,7 +36,7 @@ func (r *GenreRepository) Create(genre *models.Genre) error {
 	return nil
 }
 
-func (r *GenreRepository) GetAll() ([]models.Genre, err){
+func (r *GenreRepository) GetAll() ([]models.Genre, error){
 
 	query := `SELECT id, name FROM genres`
 
@@ -45,11 +45,11 @@ func (r *GenreRepository) GetAll() ([]models.Genre, err){
 		return nil, fmt.Errorf("failed to query genres: %w", err)
 	}
 
-	defer row.Close()
+	defer rows.Close()
 
 	var genres []models.Genre
 
-	for row.Next(){
+	for rows.Next(){
 
 		var g models.Genre
 
@@ -62,7 +62,7 @@ func (r *GenreRepository) GetAll() ([]models.Genre, err){
 
 	}
 
-	err := rows.Err()
+	err = rows.Err()
 	if err != nil {
 		return nil, fmt.Errorf("row interaction error: %w", err)
 	}
