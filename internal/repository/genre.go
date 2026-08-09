@@ -35,3 +35,38 @@ func (r *GenreRepository) Create(genre *models.Genre) error {
 
 	return nil
 }
+
+func (r *GenreRepository) GetAll() ([]models.Genre, err){
+
+	query := `SELECT id, name FROM genres`
+
+	rows, err := r.db.Query(query)
+	if err != nil {
+		return nil, fmt.Errorf("failed to query genres: %w", err)
+	}
+
+	defer row.Close()
+
+	var genres []models.Genre
+
+	for row.Next(){
+
+		var g models.Genre
+
+		err := rows.Scan(&g.ID, &g.Name)
+		if err != nil {
+			return nil, fmt.Errorf("failed to scan genres: %w", err)
+		}
+
+		genres = append(genres, g)
+
+	}
+
+	err := rows.Err()
+	if err != nil {
+		return nil, fmt.Errorf("row interaction error: %w", err)
+	}
+
+	return genres, nil
+
+}
