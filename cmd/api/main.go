@@ -41,6 +41,7 @@ func main() {
 		Name: "Sci-Fi",
 	}
 
+	fmt.Printf("\n--- Create Method ---\n")
 	fmt.Printf("Initial Value > newGenre: %+v\n", newGenre)
 
 	err = genreRepo.Create(newGenre)
@@ -49,6 +50,19 @@ func main() {
 	} else {
 		fmt.Printf("Update Value > newGenre:  %+v\n", newGenre)
 	}
+	fmt.Printf("---------------------\n")
+	
+	fmt.Printf("\n--- GetAll Method ---\n")
+	allGenres, err := genreRepo.GetAll()
+	if err != nil {
+		log.Printf("Error getting genre: %v\n", err)
+	} else {
+		fmt.Printf("Found %d genres: \n", len(allGenres))
+		for _, g := range allGenres {
+			fmt.Printf(" - ID: %d, Name: %s\n", g.ID, g.Name)
+		}
+	}
+	fmt.Printf("---------------------\n")
 
 	port := ":8080"
 	mux := http.NewServeMux()
