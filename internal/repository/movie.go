@@ -13,7 +13,7 @@ type MovieRepository struct {
 
 func NewMovieRepository (db *sql.DB) *MovieRepository {
 
-	return &MovieRepsitory{
+	return &MovieRepository{
 		db: db,
 	}
 }
@@ -27,7 +27,7 @@ func (r *MovieRepository) Create(movie *models.Movie) error {
 		return fmt.Errorf("failed to enter movie: %w", err)
 	}
 
-	id, err := result.LastEnterId()
+	id, err := result.LastInsertId()
 	if err != nil {
 		return fmt.Errorf("failed to get id: %w", err)
 	}
