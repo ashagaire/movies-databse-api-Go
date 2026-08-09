@@ -2,7 +2,10 @@ package service
 
 import (
 	"fmt"
+	"strings"
+	"errors"
 	"movies-api/internal/repository"
+	"movies-api/internal/models"
 )
 
 type GenreService struct {
@@ -11,7 +14,7 @@ type GenreService struct {
 
 func NewGenreService(repo *repository.GenreRepository) *GenreService {
 	return &GenreService{
-		repo: repo
+		repo: repo,
 	}
 }
 
@@ -34,9 +37,9 @@ func (s *GenreService) GetAll() ([]models.Genre, error) {
 	return s.repo.GetAll()
 }
 
-func (s *GenreService) GetByID(id int64) (models.Genre, error) {
+func (s *GenreService) GetByID(id int64) (*models.Genre, error) {
 	if id <= 0 {
-		return models.Genre{}, errors.New("invalid ID provided")
+		return nil, errors.New("invalid ID provided")
 	}
 	return s.repo.GetByID(id)
 }
