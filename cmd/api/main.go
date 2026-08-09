@@ -9,6 +9,8 @@ import (
 	"movies-api/internal/database"
 	"movies-api/internal/models"
 	"movies-api/internal/repository"
+	"movies-api/internal/service"
+	"movies-api/internal/handler"
 )
 
 func main() {
@@ -38,7 +40,7 @@ func main() {
 	genreRepo := repository.NewGenreRepository(db)
 	
 	newGenre := &models.Genre{
-		Name: "Horror",
+		Name: "Drama",
 	}
 
 	fmt.Printf("\n--- Create Method ---\n")
@@ -97,10 +99,14 @@ func main() {
 	}
 	fmt.Printf("---------------------\n")
 
+	genreService := service.NewGenreService(genreRepo)
+	genreHandler := handler.NewGenreHandler(genreService)
+
 	port := ":8080"
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("GET /health", HealthCheck)
+	mux.HandleFunc("GET /api/genres", genreHandler.GetAll)
 
 	fmt.Printf(">> Starting Server ...\n")
 	fmt.Printf(">> URL: http://localhost%s\n", port)
