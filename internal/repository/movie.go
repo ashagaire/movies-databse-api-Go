@@ -151,4 +151,12 @@ func (r *MovieRepository) GetAll() ([]models.Movie, error) {
 			movie.Actors = append(movie.Actors, a)
 		}
 	}
+
+	var finalMovies []models.Movies
+	
+	for _, id := range movieIDs {
+		finalMovies = append(finalMovies, *movieMap[id])
+	}
+
+	return finalMovies, nil
 }
