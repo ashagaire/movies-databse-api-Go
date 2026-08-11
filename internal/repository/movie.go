@@ -20,9 +20,17 @@ func NewMovieRepository (db *sql.DB) *MovieRepository {
 
 func (r *MovieRepository) Create(movie *models.Movie) error {
 
+	tx, err := r.db.Begin()
+	if err != nil {
+		return fmt.Errorf("failed to begin transaction: %w", err)
+	}
+
+	defer tx.Rollback()
+
+	
 	query := `INSET INTO movies (title, release_year, duration) VALUES (?,?,?)`
 
-	result, err := r.db.Exec(query, movie.Title, movie.ReleaseYear, movie.Duration)
+	result, err := tx.Exec(query, movie.Title, movie.ReleaseYear, movie.Duration)
 	if err != nil {
 		return fmt.Errorf("failed to enter movie: %w", err)
 	}
@@ -37,7 +45,7 @@ func (r *MovieRepository) Create(movie *models.Movie) error {
 	for _, genre := range movie.Genres(
 		
 		genreQuery := `INSERT INTO movie_genres (movie_id, genre_id) VALUES (?, ?)`
-		_, err := db.Exec(genreQuery, movie.ID, genre.ID)
+		_, err := tx.Exec(genreQuery, movie.ID, genre.ID)
 		if err != nil{
 			return fmt.Errorf("failed to link genre ID %d: %w", genre.ID, err)
 		}
@@ -47,7 +55,7 @@ func (r *MovieRepository) Create(movie *models.Movie) error {
 	for _, actor := range movie.Actors(
 
 		actorQuery := `INSERT INTO movie_actors (movie_id, actor_id) VALUES (?, ?)`
-		_, err := db.Exec(actorQuery, movie.ID, actor.ID)
+		_, err := tx.Exec(actorQuery, movie.ID, actor.ID)
 		if err != nil{
 			return fmt.Errorf("failed to link actor ID %d: %w", actor.ID, err)
 		}
