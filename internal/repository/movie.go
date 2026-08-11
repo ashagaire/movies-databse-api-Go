@@ -2,6 +2,7 @@ package repository
 
 import (
 	"fmt"
+	"errors"
 	"database/sql"
 	"movies-api/internal/models"
 )
@@ -156,7 +157,7 @@ func (r *MovieRepository) GetAll() ([]models.Movie, error) {
 		}
 	}
 
-	var finalMovies []models.Movies
+	var finalMovies []models.Movie
 	
 	for _, id := range movieIDs {
 		finalMovies = append(finalMovies, *movieMap[id])
@@ -282,7 +283,7 @@ func (r *MovieRepository) Update(movie *models.Movie) error {
 
 	}
 
-	err := tx.Commit();
+	err = tx.Commit();
 	if err != nil {
 		return fmt.Errorf("failed to commit transaction: %w", err)
 	}
