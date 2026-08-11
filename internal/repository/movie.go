@@ -29,7 +29,7 @@ func (r *MovieRepository) Create(movie *models.Movie) error {
 	defer tx.Rollback()
 
 	
-	query := `INSET INTO movies (title, release_year, duration) VALUES (?,?,?)`
+	query := `INSERT INTO movies (title, release_year, duration) VALUES (?,?,?)`
 
 	result, err := tx.Exec(query, movie.Title, movie.ReleaseYear, movie.Duration)
 	if err != nil {
@@ -62,6 +62,11 @@ func (r *MovieRepository) Create(movie *models.Movie) error {
 		}
 
 	}
+
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("failed to commit transaction: %w", err)
+	}
+
 
 	return nil
 
@@ -186,7 +191,7 @@ func (r *MovieRepository) GetByID(id int64) (models.Movie, error) {
 	genreQuery := `
 		SELECT genres.id, genres.name 
 		FROM genres
-		INNER JOIN movie_genres movie_genres ON genre.id = movie_genres.genre_id 
+		INNER JOIN movie_genres movie_genres ON genres.id = movie_genres.genre_id 
 		WHERE movie_genres.movie_id = ?
 	`
 
