@@ -204,7 +204,7 @@ func (r *MovieRepository) GetByID(id int64) (models.Movie, error) {
 		}
 
 		m.Genres = append(m.Genres, g)
-		
+
 	}
 
 	actorQuery := `
@@ -233,4 +233,59 @@ func (r *MovieRepository) GetByID(id int64) (models.Movie, error) {
 	}
 
 	return m, nil
+}
+
+
+func (r *MovieRepository) Update(movie *models.Movie) error {
+	
+	tx, err := r.db.Begin()
+	if err != nil {
+		return fmt.Errorf("failed to begin transaction: %w", err)
+	}
+	
+	defer tx.Rollback()
+
+	query := `UPDATE movies SET title = ?, release_year = ?, duration = ? WHERE id = ?`
+	
+	_, err = tx.Exec(query, movie.Title, movie.ReleaseYear, movie.Duration, movie.ID)
+	if err != nil {
+		return fmt.Errorf("failed to update movie: %w", err)
+	}
+
+
+	_, err = tx.Exec(`DELETE FROM movie_genres WHERE movie_id = ?`, movie.ID)
+	if err != nil {
+		return fmt.Errorf("failed to delete old genres: %w", err)
+	}
+	
+	_, err = tx.Exec(`DELETE FROM movie_actors WHERE movie_id = ?`, movie.ID)
+	if err != nil {
+		return fmt.Errorf("failed to delete old actors: %w", err)
+	}
+
+
+	for _, genre := range movie.Genres {
+
+		_, err = tx.Exec(`INSERT INTO movie_genres (movie_id, genre_id) VALUES (?, ?)`, movie.ID, genre.ID)
+		if err != nil {
+			return fmt.Errorf("failed to insert new genre: %w", err)
+		}
+
+	}
+
+	for _, actor := range movie.Actors {
+
+		_, err = tx.Exec(`INSERT INTO movie_actors (movie_id, actor_id) VALUES (?, ?)`, movie.ID, actor.ID)
+		if err != nil {
+			return fmt.Errorf("failed to insert new actor: %w", err)
+		}
+
+	}
+
+	err := tx.Commit();
+	if err != nil {
+		return fmt.Errorf("failed to commit transaction: %w", err)
+	}
+
+	return nil
 }
