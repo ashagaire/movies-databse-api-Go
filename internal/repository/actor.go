@@ -67,3 +67,21 @@ func (r *ActorRepository) GetAll()([]models.Actor, error){
 
 	return actors, nil
 }
+
+func (r *ActorRepository) GetByID(id int64) (*models.Actor, error) {
+
+	query = `SELECT id, name, birth_date FROM actors WHERE id = ?`
+
+	var a models.Actor
+
+	err := r.db.QueryRow(query,id).Scan(&a.ID, &a.Name, &a.BirthDate)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, fmt.Errorf("actor with ID %d not found", id)
+		}
+		return nil, fmt.Errorf("failed to query actor: %w", err)
+	}
+
+	return &a, nil
+
+}
