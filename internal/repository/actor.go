@@ -70,7 +70,7 @@ func (r *ActorRepository) GetAll()([]models.Actor, error){
 
 func (r *ActorRepository) GetByID(id int64) (*models.Actor, error) {
 
-	query = `SELECT id, name, birth_date FROM actors WHERE id = ?`
+	query := `SELECT id, name, birth_date FROM actors WHERE id = ?`
 
 	var a models.Actor
 
@@ -88,7 +88,7 @@ func (r *ActorRepository) GetByID(id int64) (*models.Actor, error) {
 
 func (r *ActorRepository) Update(actor *models.Actor) err{
 
-	query = `UPDATE actors SET name = ?, birth_date = ? WHERE id = ?`
+	query := `UPDATE actors SET name = ?, birth_date = ? WHERE id = ?`
 	_, err := r.db.Exec(query, actor.Name, actor.BirthDate, actor.ID)
 
 	if err != nil {
@@ -102,6 +102,12 @@ func (r *ActorRepository) Update(actor *models.Actor) err{
 
 func (r *ActorRepository) Delete(id int64) err{
 
-	
+	query := `DELETE FROM actors WHERE id = ?`
+	_, err := r.db.Exec(query, id)
+	if err != nil {
+		return fmt.Errorf("failed to delete actor: %w", err)
+	}
+
+	return nil
 }
 
