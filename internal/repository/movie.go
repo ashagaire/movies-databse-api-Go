@@ -42,7 +42,7 @@ func (r *MovieRepository) Create(movie *models.Movie) error {
 
 	movie.ID = movieID
 
-	for _, genre := range movie.Genres(
+	for _, genre := range movie.Genres{
 		
 		genreQuery := `INSERT INTO movie_genres (movie_id, genre_id) VALUES (?, ?)`
 		_, err := tx.Exec(genreQuery, movie.ID, genre.ID)
@@ -50,9 +50,9 @@ func (r *MovieRepository) Create(movie *models.Movie) error {
 			return fmt.Errorf("failed to link genre ID %d: %w", genre.ID, err)
 		}
 
-	)
+	}
 
-	for _, actor := range movie.Actors(
+	for _, actor := range movie.Actors{
 
 		actorQuery := `INSERT INTO movie_actors (movie_id, actor_id) VALUES (?, ?)`
 		_, err := tx.Exec(actorQuery, movie.ID, actor.ID)
@@ -60,7 +60,7 @@ func (r *MovieRepository) Create(movie *models.Movie) error {
 			return fmt.Errorf("failed to link actor ID %d: %w", actor.ID, err)
 		}
 
-	)
+	}
 
 	return nil
 
