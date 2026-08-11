@@ -112,6 +112,7 @@ func (r *MovieRepository) GetAll() ([]models.Movie, error) {
 	defer genreRows.Close()
 
 	for genreRows.Next() {
+		
 		var movieID int64
 		var g models.Genre
 
@@ -123,6 +124,31 @@ func (r *MovieRepository) GetAll() ([]models.Movie, error) {
 		movie, exists := movieMap[movieID]
 		if exists == true {
 			movie.Genres = append(movie.Genres, g)
+		}
+	}
+
+	actorQuery := `
+
+	`
+	actorRows, err := r.db.Query(actorQuery)
+	if err != nil {
+		return nil, fmt.Errorf("failed to query movie actors: %w", err)
+	}
+	defer actorRows.Close()
+
+	for actorRows.Next() {
+
+		var movieID int64
+		var a models.Actor
+		
+		err := actorRows.Scan(&movieID, &a.ID, &a.Name, &a.BirthDate)
+		if  err != nil {
+			return nil, fmt.Errorf("failed to scan movie actor: %w", err)
+		}
+
+		movie, exists := movieMap[movieID]
+		if exists == true {
+			movie.Actors = append(movie.Actors, a)
 		}
 	}
 }
