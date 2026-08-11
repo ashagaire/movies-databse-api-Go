@@ -289,3 +289,15 @@ func (r *MovieRepository) Update(movie *models.Movie) error {
 
 	return nil
 }
+
+func (r *MovieRepository) Delete(id int64) error {
+	
+	query := `DELETE FROM movies WHERE id = ?`
+	
+	_, err := r.db.Exec(query, id)
+	if err != nil {
+		return fmt.Errorf("failed to delete movie: %w", err)
+	}
+
+	return nil
+}
