@@ -103,7 +103,9 @@ func (r *MovieRepository) GetAll() ([]models.Movie, error) {
 	}
 
 	genreQuery := `
-
+		SELECT movie_genres.movie_id, genres.id, genres.name 
+		FROM genres
+		INNER JOIN movie_genres ON genres.id = movie_genres.genre_id
 	`
 	genreRows, err := r.db.Query(genreQuery)
 	if err != nil {
@@ -128,7 +130,9 @@ func (r *MovieRepository) GetAll() ([]models.Movie, error) {
 	}
 
 	actorQuery := `
-
+		SELECT movie_actors.movie_id, actors.id, actors.name, actors.birth_date 
+		FROM actors 
+		INNER JOIN movie_actors ON actors.id = movie_actors.actor_id
 	`
 	actorRows, err := r.db.Query(actorQuery)
 	if err != nil {
