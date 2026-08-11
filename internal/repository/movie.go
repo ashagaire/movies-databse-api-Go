@@ -102,5 +102,27 @@ func (r *MovieRepository) GetAll() ([]models.Movie, error) {
 		return []models.Movie{}, nil
 	}
 
-	
+	genreQuery := `
+
+	`
+	genreRows, err := r.db.Query(genreQuery)
+	if err != nil {
+		return nil, fmt.Errorf("failed to query movie genres: %w", err)
+	}
+	defer genreRows.Close()
+
+	for genreRows.Next() {
+		var movieID int64
+		var g models.Genre
+
+		err := genreRows.Scan(&movieID, &g.ID, &g.Name)
+		if err != nil {
+			return nil, fmt.Errorf("failed to scan movie genre: %w", err)
+		}
+
+		movie, exists := movieMap[movieID]
+		if exists == true {
+			movie.Genres = append(movie.Genres, g)
+		}
+	}
 }
