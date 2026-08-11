@@ -65,3 +65,42 @@ func (r *MovieRepository) Create(movie *models.Movie) error {
 	return nil
 
 }
+
+
+func (r *MovieRepository) GetAll() ([]models.Movie, error) {
+
+	movieQuery := `SELECT id, title, release_year, duration FROM movies`
+	movieRows, err := r.db.Query(movieQuery)
+	if err != nil {
+		return nil, fmt.Errorf("failed to query movies: %w", err)
+	}
+	
+	defer movieRows.Close()
+
+	movieMap := make(map[int64]*models.Movie)
+
+	var movieIDs []int64
+
+	for movieRows.Next(){
+		
+		var m models.Movie
+
+		err := movieRows.Scan(&m.ID, &m.Title, &m.ReleaseYear, &m.Duration)
+		if  err != nil {
+			return nil, fmt.Errorf("failed to scan movie: %w", err)
+		}
+
+		m.Genres = []models.Genre{}
+		m.Actors = []models.Actor{}
+
+		movieMap[m.ID] = &m
+		movieIDs = append(movieIDs, m.ID)
+
+	}
+
+	if len(movieMap) == 0 {
+		return []models.Movie{}, nil
+	}
+
+	
+}
