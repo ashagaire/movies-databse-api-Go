@@ -2,6 +2,7 @@ package repository
 
 import (
 	"fmt"
+	"errors"
 	"database/sql"
 	"movies-api/internal/models"
 )
@@ -57,7 +58,7 @@ func (r *ActorRepository) GetAll()([]models.Actor, error){
 			return nil, fmt.Errorf("failed to scan actor: %w", err)
 		}
 
-		rows = append(actors, a)
+		actors = append(actors, a)
 	}
 	
 	err = rows.Err();
@@ -86,7 +87,7 @@ func (r *ActorRepository) GetByID(id int64) (*models.Actor, error) {
 
 }
 
-func (r *ActorRepository) Update(actor *models.Actor) err{
+func (r *ActorRepository) Update(actor *models.Actor) error{
 
 	query := `UPDATE actors SET name = ?, birth_date = ? WHERE id = ?`
 	_, err := r.db.Exec(query, actor.Name, actor.BirthDate, actor.ID)
@@ -100,7 +101,7 @@ func (r *ActorRepository) Update(actor *models.Actor) err{
 }
 
 
-func (r *ActorRepository) Delete(id int64) err{
+func (r *ActorRepository) Delete(id int64) error{
 
 	query := `DELETE FROM actors WHERE id = ?`
 	_, err := r.db.Exec(query, id)
