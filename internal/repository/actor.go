@@ -85,3 +85,23 @@ func (r *ActorRepository) GetByID(id int64) (*models.Actor, error) {
 	return &a, nil
 
 }
+
+func (r *ActorRepository) Update(actor *models.Actor) err{
+
+	query = `UPDATE actors SET name = ?, birth_date = ? WHERE id = ?`
+	_, err := r.db.Exec(query, actor.Name, actor.BirthDate, actor.ID)
+
+	if err != nil {
+		return fmt.Errorf("failed to update actor: %w", err)
+	}
+
+	return nil
+
+}
+
+
+func (r *ActorRepository) Delete(id int64) err{
+
+	
+}
+
