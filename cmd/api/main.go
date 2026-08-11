@@ -40,7 +40,7 @@ func main() {
 	genreRepo := repository.NewGenreRepository(db)
 	
 	newGenre := &models.Genre{
-		Name: "Drama",
+		Name: "Thriller",
 	}
 
 	fmt.Printf("\n--- Create Method ---\n")

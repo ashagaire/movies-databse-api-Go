@@ -2,6 +2,7 @@ package repository
 
 import (
 	"fmt"
+	"errors"
 	"database/sql"
 	"movies-api/internal/models"
 )
@@ -10,13 +11,13 @@ type ActorRepository struct {
 	db *sql.DB
 }
 
-func NewActorRepository(db *sql.DB) *ActorRepository {
+func NewActorRepository(db *sql.DB) *ActorRepository{
 	return &ActorRepository{
 		db: db,
 	}
 }
 
-func (r *ActorRepository) Create(actor *models.Actor) error {
+func (r *ActorRepository) Create(actor *models.Actor) error{
 
 	query := `INSERT INTO actors (name, birth_date) VALUES (?, ?)`
 
@@ -34,3 +35,80 @@ func (r *ActorRepository) Create(actor *models.Actor) error {
 
 	return nil
 }
+
+func (r *ActorRepository) GetAll()([]models.Actor, error){
+
+	query := `SELECT id, name, birth_date FROM actors`
+
+	rows, err := r.db.Query(query)
+	if err != nil {
+		return nil, fmt.Errorf("failed to query actors: %w", err)
+	}
+
+	defer rows.Close()
+
+	var actors []models.Actor
+	
+	for rows.Next(){
+		
+		var a models.Actor
+
+		err := rows.Scan(&a.ID, &a.Name, &a.BirthDate)
+		if err != nil {
+			return nil, fmt.Errorf("failed to scan actor: %w", err)
+		}
+
+		actors = append(actors, a)
+	}
+	
+	err = rows.Err();
+	if err != nil {
+		return nil, fmt.Errorf("row iteration error: %w", err)
+	}
+
+	return actors, nil
+}
+
+func (r *ActorRepository) GetByID(id int64) (*models.Actor, error) {
+
+	query := `SELECT id, name, birth_date FROM actors WHERE id = ?`
+
+	var a models.Actor
+
+	err := r.db.QueryRow(query,id).Scan(&a.ID, &a.Name, &a.BirthDate)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, fmt.Errorf("actor with ID %d not found", id)
+		}
+		return nil, fmt.Errorf("failed to query actor: %w", err)
+	}
+
+	return &a, nil
+
+}
+
+func (r *ActorRepository) Update(actor *models.Actor) error{
+
+	query := `UPDATE actors SET name = ?, birth_date = ? WHERE id = ?`
+	_, err := r.db.Exec(query, actor.Name, actor.BirthDate, actor.ID)
+
+	if err != nil {
+		return fmt.Errorf("failed to update actor: %w", err)
+	}
+
+	return nil
+
+}
+
+
+func (r *ActorRepository) Delete(id int64) error{
+
+	query := `DELETE FROM actors WHERE id = ?`
+	_, err := r.db.Exec(query, id)
+	if err != nil {
+		return fmt.Errorf("failed to delete actor: %w", err)
+	}
+
+	return nil
+}
+
