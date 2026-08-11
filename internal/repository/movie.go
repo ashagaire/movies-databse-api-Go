@@ -164,3 +164,73 @@ func (r *MovieRepository) GetAll() ([]models.Movie, error) {
 
 	return finalMovies, nil
 }
+
+
+func (r *MovieRepository) GetByID(id int64) (models.Movie, error) {
+
+	var m models.Movie
+	m.Genres = []models.Genre{} 
+	m.Actors = []models.Actor{}
+
+	movieQuery := `SELECT id, title, release_year, duration FROM movies WHERE id = ?`
+
+	err := r.db.QueryRow(movieQuery, id).Scan(&m.ID, &m.Title, &m.ReleaseYear, &m.Duration)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return m, fmt.Errorf("movie with ID %d not found", id)
+		}
+		return m, fmt.Errorf("failed to query movie: %w", err)
+	}
+
+	genreQuery := `
+		SELECT genres.id, genres.name 
+		FROM genres
+		INNER JOIN movie_genres movie_genres ON genre.id = movie_genres.genre_id 
+		WHERE movie_genres.movie_id = ?
+	`
+
+	genreRows, err := r.db.Query(genreQuery, id)
+	if err != nil {
+		return m, fmt.Errorf("failed to query movie genres: %w", err)
+	}
+	defer genreRows.Close()
+
+	for genreRows.Next() {
+		var g models.Genre
+
+		err := genreRows.Scan(&g.ID, &g.Name) 
+		if err != nil {
+			return m, fmt.Errorf("failed to scan genre: %w", err)
+		}
+
+		m.Genres = append(m.Genres, g)
+		
+	}
+
+	actorQuery := `
+		SELECT actors.id, actors.name, actors.birth_date 
+		FROM actors
+		INNER JOIN movie_actors movie_actors ON actors.id = movie_actors.actor_id 
+		WHERE movie_actors.movie_id = ?
+	`
+
+	actorRows, err := r.db.Query(actorQuery, id)
+	if err != nil {
+		return m, fmt.Errorf("failed to query movie actors: %w", err)
+	}
+	defer actorRows.Close()
+
+	for actorRows.Next() {
+		var a models.Actor
+
+		err := actorRows.Scan(&a.ID, &a.Name, &a.BirthDate)
+		if err != nil {
+			return m, fmt.Errorf("failed to scan actor: %w", err)
+		}
+
+		m.Actors = append(m.Actors, a)
+	
+	}
+
+	return m, nil
+}
