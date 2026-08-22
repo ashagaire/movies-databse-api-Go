@@ -87,9 +87,8 @@ func (s *ActorService) Delete(id int64, force bool) error {
 		return errors.New("invalid ID provided")
 	}
 
-	if force {
-		// TODO: Implement the force delete logic
-		fmt.Println("Force delete requested for actor!")
+	if force == true {
+		return s.repo.ForceDelete(id)
 	}
 
 	return s.repo.Delete(id)
