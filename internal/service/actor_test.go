@@ -10,13 +10,21 @@ import (
 
 func setupTestDB(t *testing.T) *sql.DB {
 
-	db, err := sql.Open("sqlite3", ":memory:")
+	db, err := sql.Open("sqlite3", ":memory:?_foreign_keys=on")
 	if err != nil {
 		t.Fatalf("Failed to open test database: %v", err)
 	}
 
 	schema := `
 		CREATE TABLE actors (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, birth_date TEXT NOT NULL);
+		CREATE TABLE IF NOT EXISTS movie_actors (    
+		movie_id INTEGER NOT NULL,
+		actor_id INTEGER NOT NULL,
+		PRIMARY KEY (movie_id, actor_id),
+		FOREIGN KEY (movie_id) REFERENCES movies(id) ON DELETE RESTRICT,
+		FOREIGN KEY (actor_id) REFERENCES actors(id) ON DELETE RESTRICT
+
+	);
 	`
 	_, err = db.Exec(schema)
 	if err != nil {
@@ -98,4 +106,36 @@ func TestActorService_CreateValidation(t *testing.T) {
 		})
 	}
 
+}
+
+
+func TestActorService_DeleteLogic(t *testing.T) {
+
+	db := setupTestDB(t)
+	defer db.Close()
+	
+	repo := repository.NewActorRepository(db)
+	svc := NewActorService(repo)
+
+	actor := &models.Actor{Name: "Tom Hanks", BirthDate: "1956-07-09"}
+	svc.Create(actor)
+
+
+	db.Exec(`INSERT INTO movies (id, title, release_year, duration) VALUES (1, 'Cast Away', 2000, 143)`)
+	db.Exec(`INSERT INTO movie_actors (movie_id, actor_id) VALUES (1, ?)`, actor.ID)
+
+	err := svc.Delete(actor.ID, false)
+	if err == nil {
+		t.Errorf("Expected normal delete to fail because actor is linked to a movie, but it succeeded!")
+	}
+
+	err = svc.Delete(actor.ID, true)
+	if err != nil {
+		t.Errorf("Expected force delete to succeed, but got error: %v", err)
+	}
+
+	_, err = svc.GetByID(actor.ID)
+	if err == nil {
+		t.Errorf("Actor should be deleted, but was still found!")
+	}
 }
