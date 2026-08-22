@@ -112,3 +112,30 @@ func (r *ActorRepository) Delete(id int64) error{
 	return nil
 }
 
+func (r *ActorRepository) ForceDelete(id int64) error{
+
+	tx, err := r.db.Begin()
+	if err != nil {
+		return fmt.Errorf("failed to begin transaction: %w", err)
+	}
+	defer tx.Rollback()
+
+	_, err = tx.Exec(`DELETE FROM movie_actors WHERE actor_id = ?`, id)
+	if err != nil {
+		return fmt.Errorf("failed to delete actor relationships: %w", err)
+	}
+
+	_, err = tx.Exec(`DELETE FROM actors WHERE id = ?`, id)
+	if err != nil {
+		return fmt.Errorf("failed to delete actor: %w", err)
+	}
+
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("failed to commit transaction: %w", err)
+	}
+
+	return nil
+
+
+}
+

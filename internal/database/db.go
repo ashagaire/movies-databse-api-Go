@@ -10,7 +10,9 @@ import (
 
 func New(dbPath string) (*sql.DB, error) {
 
-	db, err := sql.Open("sqlite3", dbPath)
+	connectionString := dbPath + "?_foreign_keys=on"
+
+	db, err := sql.Open("sqlite3", connectionString)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open database: %w", err)
 	}

@@ -307,3 +307,35 @@ func (r *MovieRepository) Delete(id int64) error {
 
 	return nil
 }
+
+func (r *MovieRepository) ForceDelete(id int64) error {
+	
+	tx, err := r.db.Begin()
+	if err != nil {
+		return fmt.Errorf("failed to begin transaction: %w", err)
+	}
+	defer tx.Rollback()
+
+	_, err = tx.Exec(`DELETE FROM movie_genres WHERE movie_id = ?`, id)
+	if err != nil {
+		return fmt.Errorf("failed to delete movie genres: %w", err)
+	}
+
+	_, err = tx.Exec(`DELETE FROM movie_actors WHERE movie_id = ?`, id)
+	if err != nil {
+		return fmt.Errorf("failed to delete movie actors: %w", err)
+	}
+
+	_, err = tx.Exec(`DELETE FROM movies WHERE id = ?`, id)
+	if err != nil {
+		return fmt.Errorf("failed to delete movie: %w", err)
+	}
+
+	err = tx.Commit() 
+	if err != nil {
+		return fmt.Errorf("failed to commit transaction: %w", err)
+	}
+
+	return nil
+}
+
