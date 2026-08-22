@@ -61,7 +61,7 @@ func (h *GenreHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *GenreHandler) GetAll(w http.ResponseWriter, r *http.Request) {
+func (h *GenreHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 
 	// PathValue extract the string
 	idStr := r.PathValue("id")
@@ -76,9 +76,39 @@ func (h *GenreHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusNotFound) // 404 Not Found
 		return
 	}
+
 	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
 	err = json.NewEncoder(w).Encode(genre)
 	if err != nil {
 		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
 	}
+}
+
+func (h *GenreHandler) Update(w http.ResponseWriter, r *http.Request) {
+
+	idStr := r.PathValue("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		http.Error(w, "Invalid ID format", http.StatusBadRequest)
+		return
+	}
+
+	var genre models.Genre
+	err = json.NewDecoder(r.Body).Decode(&genre)
+	if err != nil {
+		http.Error(w, "Invalid JSON payload", http.StatusBadRequest)
+		return
+	}
+
+	genre.ID = id
+	err = h.service.Update(&genre)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("Genre updated successfully"))
 }
