@@ -102,3 +102,18 @@ func (h *MovieHandler) Delete(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusNoContent)
 }
+
+func (h *MovieHandler) Search(w http.ResponseWriter, r *http.Request) {
+
+	title := r.URL.Query().Get("title")
+
+	movies, err := h.service.SearchByTitle(title)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(movies)
+}
