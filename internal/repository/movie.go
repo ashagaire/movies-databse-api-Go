@@ -1,18 +1,17 @@
 package repository
 
 import (
-	"fmt"
-	"errors"
 	"database/sql"
+	"errors"
+	"fmt"
 	"movies-api/internal/models"
 )
 
 type MovieRepository struct {
-
 	db *sql.DB
 }
 
-func NewMovieRepository (db *sql.DB) *MovieRepository {
+func NewMovieRepository(db *sql.DB) *MovieRepository {
 
 	return &MovieRepository{
 		db: db,
@@ -28,7 +27,6 @@ func (r *MovieRepository) Create(movie *models.Movie) error {
 
 	defer tx.Rollback()
 
-	
 	query := `INSERT INTO movies (title, release_year, duration) VALUES (?,?,?)`
 
 	result, err := tx.Exec(query, movie.Title, movie.ReleaseYear, movie.Duration)
@@ -43,21 +41,21 @@ func (r *MovieRepository) Create(movie *models.Movie) error {
 
 	movie.ID = movieID
 
-	for _, genre := range movie.Genres{
-		
+	for _, genre := range movie.Genres {
+
 		genreQuery := `INSERT INTO movie_genres (movie_id, genre_id) VALUES (?, ?)`
 		_, err := tx.Exec(genreQuery, movie.ID, genre.ID)
-		if err != nil{
+		if err != nil {
 			return fmt.Errorf("failed to link genre ID %d: %w", genre.ID, err)
 		}
 
 	}
 
-	for _, actor := range movie.Actors{
+	for _, actor := range movie.Actors {
 
 		actorQuery := `INSERT INTO movie_actors (movie_id, actor_id) VALUES (?, ?)`
 		_, err := tx.Exec(actorQuery, movie.ID, actor.ID)
-		if err != nil{
+		if err != nil {
 			return fmt.Errorf("failed to link actor ID %d: %w", actor.ID, err)
 		}
 
@@ -67,11 +65,9 @@ func (r *MovieRepository) Create(movie *models.Movie) error {
 		return fmt.Errorf("failed to commit transaction: %w", err)
 	}
 
-
 	return nil
 
 }
-
 
 func (r *MovieRepository) GetAll() ([]models.Movie, error) {
 
@@ -80,19 +76,19 @@ func (r *MovieRepository) GetAll() ([]models.Movie, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to query movies: %w", err)
 	}
-	
+
 	defer movieRows.Close()
 
 	movieMap := make(map[int64]*models.Movie)
 
 	var movieIDs []int64
 
-	for movieRows.Next(){
-		
+	for movieRows.Next() {
+
 		var m models.Movie
 
 		err := movieRows.Scan(&m.ID, &m.Title, &m.ReleaseYear, &m.Duration)
-		if  err != nil {
+		if err != nil {
 			return nil, fmt.Errorf("failed to scan movie: %w", err)
 		}
 
@@ -109,7 +105,7 @@ func (r *MovieRepository) GetAll() ([]models.Movie, error) {
 	}
 
 	genreQuery := `
-		SELECT movie_genres.movie_id, genres.id, genres.name 
+		SELECT movie_genres.movie_id, genres.id, genres.name
 		FROM genres
 		INNER JOIN movie_genres ON genres.id = movie_genres.genre_id
 	`
@@ -120,7 +116,7 @@ func (r *MovieRepository) GetAll() ([]models.Movie, error) {
 	defer genreRows.Close()
 
 	for genreRows.Next() {
-		
+
 		var movieID int64
 		var g models.Genre
 
@@ -136,8 +132,8 @@ func (r *MovieRepository) GetAll() ([]models.Movie, error) {
 	}
 
 	actorQuery := `
-		SELECT movie_actors.movie_id, actors.id, actors.name, actors.birth_date 
-		FROM actors 
+		SELECT movie_actors.movie_id, actors.id, actors.name, actors.birth_date
+		FROM actors
 		INNER JOIN movie_actors ON actors.id = movie_actors.actor_id
 	`
 	actorRows, err := r.db.Query(actorQuery)
@@ -150,9 +146,9 @@ func (r *MovieRepository) GetAll() ([]models.Movie, error) {
 
 		var movieID int64
 		var a models.Actor
-		
+
 		err := actorRows.Scan(&movieID, &a.ID, &a.Name, &a.BirthDate)
-		if  err != nil {
+		if err != nil {
 			return nil, fmt.Errorf("failed to scan movie actor: %w", err)
 		}
 
@@ -163,7 +159,7 @@ func (r *MovieRepository) GetAll() ([]models.Movie, error) {
 	}
 
 	var finalMovies []models.Movie
-	
+
 	for _, id := range movieIDs {
 		finalMovies = append(finalMovies, *movieMap[id])
 	}
@@ -171,11 +167,10 @@ func (r *MovieRepository) GetAll() ([]models.Movie, error) {
 	return finalMovies, nil
 }
 
-
 func (r *MovieRepository) GetByID(id int64) (models.Movie, error) {
 
 	var m models.Movie
-	m.Genres = []models.Genre{} 
+	m.Genres = []models.Genre{}
 	m.Actors = []models.Actor{}
 
 	movieQuery := `SELECT id, title, release_year, duration FROM movies WHERE id = ?`
@@ -189,9 +184,9 @@ func (r *MovieRepository) GetByID(id int64) (models.Movie, error) {
 	}
 
 	genreQuery := `
-		SELECT genres.id, genres.name 
+		SELECT genres.id, genres.name
 		FROM genres
-		INNER JOIN movie_genres movie_genres ON genres.id = movie_genres.genre_id 
+		INNER JOIN movie_genres movie_genres ON genres.id = movie_genres.genre_id
 		WHERE movie_genres.movie_id = ?
 	`
 
@@ -204,7 +199,7 @@ func (r *MovieRepository) GetByID(id int64) (models.Movie, error) {
 	for genreRows.Next() {
 		var g models.Genre
 
-		err := genreRows.Scan(&g.ID, &g.Name) 
+		err := genreRows.Scan(&g.ID, &g.Name)
 		if err != nil {
 			return m, fmt.Errorf("failed to scan genre: %w", err)
 		}
@@ -214,9 +209,9 @@ func (r *MovieRepository) GetByID(id int64) (models.Movie, error) {
 	}
 
 	actorQuery := `
-		SELECT actors.id, actors.name, actors.birth_date 
+		SELECT actors.id, actors.name, actors.birth_date
 		FROM actors
-		INNER JOIN movie_actors movie_actors ON actors.id = movie_actors.actor_id 
+		INNER JOIN movie_actors movie_actors ON actors.id = movie_actors.actor_id
 		WHERE movie_actors.movie_id = ?
 	`
 
@@ -235,40 +230,37 @@ func (r *MovieRepository) GetByID(id int64) (models.Movie, error) {
 		}
 
 		m.Actors = append(m.Actors, a)
-	
+
 	}
 
 	return m, nil
 }
 
-
 func (r *MovieRepository) Update(movie *models.Movie) error {
-	
+
 	tx, err := r.db.Begin()
 	if err != nil {
 		return fmt.Errorf("failed to begin transaction: %w", err)
 	}
-	
+
 	defer tx.Rollback()
 
 	query := `UPDATE movies SET title = ?, release_year = ?, duration = ? WHERE id = ?`
-	
+
 	_, err = tx.Exec(query, movie.Title, movie.ReleaseYear, movie.Duration, movie.ID)
 	if err != nil {
 		return fmt.Errorf("failed to update movie: %w", err)
 	}
 
-
 	_, err = tx.Exec(`DELETE FROM movie_genres WHERE movie_id = ?`, movie.ID)
 	if err != nil {
 		return fmt.Errorf("failed to delete old genres: %w", err)
 	}
-	
+
 	_, err = tx.Exec(`DELETE FROM movie_actors WHERE movie_id = ?`, movie.ID)
 	if err != nil {
 		return fmt.Errorf("failed to delete old actors: %w", err)
 	}
-
 
 	for _, genre := range movie.Genres {
 
@@ -288,7 +280,7 @@ func (r *MovieRepository) Update(movie *models.Movie) error {
 
 	}
 
-	err = tx.Commit();
+	err = tx.Commit()
 	if err != nil {
 		return fmt.Errorf("failed to commit transaction: %w", err)
 	}
@@ -297,9 +289,9 @@ func (r *MovieRepository) Update(movie *models.Movie) error {
 }
 
 func (r *MovieRepository) Delete(id int64) error {
-	
+
 	query := `DELETE FROM movies WHERE id = ?`
-	
+
 	_, err := r.db.Exec(query, id)
 	if err != nil {
 		return fmt.Errorf("failed to delete movie: %w", err)
@@ -309,7 +301,7 @@ func (r *MovieRepository) Delete(id int64) error {
 }
 
 func (r *MovieRepository) ForceDelete(id int64) error {
-	
+
 	tx, err := r.db.Begin()
 	if err != nil {
 		return fmt.Errorf("failed to begin transaction: %w", err)
@@ -331,7 +323,7 @@ func (r *MovieRepository) ForceDelete(id int64) error {
 		return fmt.Errorf("failed to delete movie: %w", err)
 	}
 
-	err = tx.Commit() 
+	err = tx.Commit()
 	if err != nil {
 		return fmt.Errorf("failed to commit transaction: %w", err)
 	}
@@ -339,3 +331,30 @@ func (r *MovieRepository) ForceDelete(id int64) error {
 	return nil
 }
 
+func (r *MovieRepository) SearchByTitle(title string) ([]models.Movie, error) {
+
+	query := `SELECT id, title, release_year, duration FROM movies WHERE title LIKE ?`
+
+	searchPattern := "%" + title + "%"
+
+	rows, err := r.db.Query(query, searchPattern)
+	if err != nil {
+		return nil, fmt.Errorf("failed to search movies: %w", err)
+	}
+	defer rows.Close()
+
+	var movies []models.Movie
+	for rows.Next() {
+		var m models.Movie
+		err := rows.Scan(&m.ID, &m.Title, &m.ReleaseYear, &m.Duration)
+		if err != nil {
+			return nil, fmt.Errorf("failed to scan movie: %w", err)
+		}
+
+		m.Genres = []models.Genre{}
+		m.Actors = []models.Actor{}
+		movies = append(movies, m)
+	}
+
+	return movies, nil
+}
