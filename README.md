@@ -10,6 +10,18 @@ This project implements a clean, layered architecture to ensure separation of co
 *   **Service Layer:** Encapsulates business logic, data validation, and transactional orchestration.
 *   **Repository Layer:** Interfaces directly with the SQLite database, executing raw SQL queries and managing complex `JOIN` operations.
 
+## Core Capabilities
+
+*   **Relational Data Management:** Full CRUD support for Movies, Actors, and Genres.
+*   **Complex Associations:** Handles Many-to-Many relationships (Movies ↔ Genres, Movies ↔ Actors) via junction tables.
+*   **Dynamic Querying:** 
+    *   Pagination (`?page=0&size=10`)
+    *   Attribute filtering (`?year=1999&genre=1`)
+    *   Case-insensitive partial text search (`/search?title=matrix`)
+*   **Strict Data Integrity:** Enforces `ON DELETE RESTRICT` foreign key constraints at the database level to prevent orphaned records.
+*   **Transactional Operations:** Implements database transactions (`BEGIN`, `COMMIT`, `ROLLBACK`) for multi-table inserts and safe `?force=true` cascading deletions.
+
+
 ## Project Structure
 
 ```text
