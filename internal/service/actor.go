@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"open-movies-db/internal/models"
 	"open-movies-db/internal/repository"
 )
 
@@ -34,4 +35,8 @@ func (s *ActorService) Create(actor *models.Actor) error{
 
 	return nil
 
+}
+
+func (s *ActorService) GetAll() ([]models.Actor, error) {
+	return s.repo.GetAll()
 }
