@@ -1,5 +1,15 @@
 # movies-api
 
+A high performance, relational REST API built in Go for managing structured movie metadata. Designed with a strict layered architecture, this API provides a strong foundation for applications requiring complex data relationships, dynamic querying, and strict data integrity.
+
+## Architecture & Design
+
+This project implements a clean, layered architecture to ensure separation of concerns, maintainability, and testability:
+
+*   **Handler Layer:** Manages HTTP request parsing, routing, and JSON serialization.
+*   **Service Layer:** Encapsulates business logic, data validation, and transactional orchestration.
+*   **Repository Layer:** Interfaces directly with the SQLite database, executing raw SQL queries and managing complex `JOIN` operations.
+
 ## Project Structure
 
 ```text
