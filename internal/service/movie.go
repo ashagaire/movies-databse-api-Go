@@ -40,3 +40,8 @@ func (s *MovieService) Create(movie *models.Movie) error {
 	return nil
 }
 
+func (s *MovieService) GetAll() ([]models.Movie, error) {
+	
+	return s.repo.GetAll()
+
+}
