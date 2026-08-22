@@ -5,6 +5,7 @@ import (
 	"movies-api/internal/models"
 	"movies-api/internal/service"
 	"net/http"
+	"strconv"
 )
 
 type GenreHandler struct {
@@ -55,6 +56,28 @@ func (h *GenreHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 
 	err = json.NewEncoder(w).Encode(genres)
 
+	if err != nil {
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+	}
+}
+
+func (h *GenreHandler) GetAll(w http.ResponseWriter, r *http.Request) {
+
+	// PathValue extract the string
+	idStr := r.PathValue("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		http.Error(w, "Invalid ID format", http.StatusBadRequest)
+		return
+	}
+
+	genre, err := h.service.GetByID(id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound) // 404 Not Found
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	err = json.NewEncoder(w).Encode(genre)
 	if err != nil {
 		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
 	}
