@@ -74,3 +74,30 @@ func TestMovieService_CreateValidation(t *testing.T) {
 		})
 	}
 }
+
+
+func TestMovieService_DeleteLogic(t *testing.T) {
+	db := setupTestDB(t)
+	defer db.Close()
+
+	movieRepo := repository.NewMovieRepository(db)
+	svc := NewMovieService(movieRepo)
+
+	movie := &models.Movie{Title: "Test Movie", ReleaseYear: 2020, Duration: 120}
+	svc.Create(movie)
+
+	db.Exec(`INSERT INTO genres (id, name) VALUES (99, 'Fake Genre')`)
+	db.Exec(`INSERT INTO movie_genres (movie_id, genre_id) VALUES (?, 99)`, movie.ID)
+
+	// Normal Delete (Should FAIL)
+	err := svc.Delete(movie.ID, false)
+	if err == nil {
+		t.Errorf("Expected normal delete to fail because movie has genres, but it succeeded!")
+	}
+
+	// Force Delete (Should SUCCEED)
+	err = svc.Delete(movie.ID, true)
+	if err != nil {
+		t.Errorf("Expected force delete to succeed, but got error: %v", err)
+	}
+}
