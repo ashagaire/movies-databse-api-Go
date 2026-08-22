@@ -77,7 +77,7 @@ func (s *ActorService) Update(id int64, updateData *models.Actor) error {
 		existingActor.BirthDate = updateData.BirthDate
 	}
 
-	return s.repo.Update(&existingActor)
+	return s.repo.Update(existingActor)
 }
 
 
