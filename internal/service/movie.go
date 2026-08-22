@@ -54,3 +54,42 @@ func (s *MovieService) GetByID(id int64) (models.Movie, error) {
 	
 	return s.repo.GetByID(id)
 }
+
+
+func (s *MovieService) Update(id int64, updateData *models.Movie) error {
+	
+	if id <= 0 {
+		return errors.New("invalid ID provided")
+	}
+
+	existingMovie, err := s.repo.GetByID(id)
+	if err != nil {
+		return err
+	}
+
+	if strings.TrimSpace(updateData.Title) != "" {
+		existingMovie.Title = strings.TrimSpace(updateData.Title)
+	}
+	
+	if updateData.ReleaseYear > 0 {
+		if updateData.ReleaseYear < 1888 {
+			return errors.New("release year must be 1888 or later")
+		}
+		
+		existingMovie.ReleaseYear = updateData.ReleaseYear
+	}
+
+	if updateData.Duration > 0 {
+		existingMovie.Duration = updateData.Duration
+	}
+	
+	// For relationships (Genres/Actors), if user provide new list, we replace the old one.
+	if updateData.Genres != nil {
+		existingMovie.Genres = updateData.Genres
+	}
+	if updateData.Actors != nil {
+		existingMovie.Actors = updateData.Actors
+	}
+	
+	return s.repo.Update(&existingMovie)
+}
