@@ -50,3 +50,29 @@ func (s *ActorService) GetByID(id int64) (models.Actor, error) {
 	return s.repo.GetByID(id)
 
 }
+
+func (s *ActorService) Update(id int64, updateData *models.Actor) error {
+
+	if id <= 0 {
+		return errors.New("invalid ID provided")
+	}
+
+	existingActor, err := s.repo.GetByID(id)
+	if err != nil {
+		return err
+	}
+
+	if strings.TrimSpace(updateData.Name) != "" {
+		existingActor.Name = strings.TrimSpace(updateData.Name)
+	}
+	
+	if updateData.BirthDate != "" {
+		_, err := time.Parse("2006-01-02", updateData.BirthDate) 
+		if err != nil {
+			return errors.New("birth date must be in YYYY-MM-DD format")
+		}
+		existingActor.BirthDate = updateData.BirthDate
+	}
+
+	return s.repo.Update(&existingActor)
+}
