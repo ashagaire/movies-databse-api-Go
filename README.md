@@ -21,6 +21,44 @@ This project implements a clean, layered architecture to ensure separation of co
 *   **Strict Data Integrity:** Enforces `ON DELETE RESTRICT` foreign key constraints at the database level to prevent orphaned records.
 *   **Transactional Operations:** Implements database transactions (`BEGIN`, `COMMIT`, `ROLLBACK`) for multi-table inserts and safe `?force=true` cascading deletions.
 
+## Tech Stack
+
+*   **Language:** Go (1.22+)
+*   **Database:** SQLite3 (`github.com/mattn/go-sqlite3`)
+*   **Routing:** Go Standard Library (`net/http` )
+
+## Setup and Installation
+
+
+### Local Development
+
+Ensure Go 1.22+ and a C compiler (required for `go-sqlite3` CGO bindings) are installed.
+
+1. Clone the repository:
+   ```bash
+   git clone https://gitea.kood.tech/muhammadowaisjaved/movies-api.git
+   cd movies-api
+    ```
+2. Download dependencies:
+    ```bash
+    go mod tidy
+    ```
+
+3. Run the application:
+    
+    ```bash
+    go run ./cmd/api/main.go
+    ```
+
+## Containerization
+
+The application includes a multi-stage Dockerfile and docker-compose.yml for consistent deployment across environments.
+    
+    ```
+    docker-compose up --build
+    ```
+
+The API will be exposed on http://localhost:8080. The SQLite database file is persisted via a Docker volume in the ./data directory.
 
 ## Project Structure
 
