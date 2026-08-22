@@ -34,6 +34,9 @@ func (s *MovieService) Create(movie *models.Movie) error {
 
 	err := s.repo.Create(movie)
 	if err != nil {
+		if strings.Contains(err.Error(), "FOREIGN KEY constraint failed") {
+			return errors.New("the provided genre ID or actor ID does not exist")
+		}
 		return fmt.Errorf("failed to create movie: %w", err)
 	}
 
