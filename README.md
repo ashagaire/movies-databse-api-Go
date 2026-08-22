@@ -78,7 +78,28 @@ To run the unit tests:
 
     go test ./... -v
 
+## API Reference
 
+### Movies
+
+| Method   | Endpoint             | Description                                                                  |
+| :------- | :------------------- | :--------------------------------------------------------------------------- |
+| `POST`   | `/api/movies`        | Create a movie and establish actor/genre relationships                       |
+| `GET`    | `/api/movies`        | Retrieve movies (Supports `page`, `size`, `year`, `genre` query params)      |
+| `GET`    | `/api/movies/search` | Search movies by title (`?title=`)                                           |
+| `GET`    | `/api/movies/{id}`   | Retrieve a specific movie                                                    |
+| `PATCH`  | `/api/movies/{id}`   | Partially update movie attributes or relationships                           |
+| `DELETE` | `/api/movies/{id}`   | Delete a movie (Fails if relationships exist unless `?force=true` is passed) |
+
+### Genres & Actors
+
+| Method   | Endpoint                                 | Description                               |
+| :------- | :--------------------------------------- | :---------------------------------------- |
+| `POST`   | `/api/genres` or `/api/actors`           | Create a new entity                       |
+| `GET`    | `/api/genres` or `/api/actors`           | Retrieve all entities                     |
+| `GET`    | `/api/genres/{id}` or `/api/actors/{id}` | Retrieve a specific entity                |
+| `PATCH`  | `/api/genres/{id}` or `/api/actors/{id}` | Partially update an entity                |
+| `DELETE` | `/api/genres/{id}` or `/api/actors/{id}` | Delete an entity (Supports `?force=true`) |
 
 ## Project Structure
 
