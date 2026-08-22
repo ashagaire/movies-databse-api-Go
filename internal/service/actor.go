@@ -76,3 +76,18 @@ func (s *ActorService) Update(id int64, updateData *models.Actor) error {
 
 	return s.repo.Update(&existingActor)
 }
+
+
+func (s *ActorService) Delete(id int64, force bool) error {
+	
+	if id <= 0 {
+		return errors.New("invalid ID provided")
+	}
+
+	if force {
+		// TODO: Implement the force delete logic
+		fmt.Println("Force delete requested for actor!")
+	}
+
+	return s.repo.Delete(id)
+}
