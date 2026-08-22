@@ -45,3 +45,12 @@ func (s *MovieService) GetAll() ([]models.Movie, error) {
 	return s.repo.GetAll()
 
 }
+
+func (s *MovieService) GetByID(id int64) (models.Movie, error) {
+	
+	if id <= 0 {
+		return models.Movie{}, errors.New("invalid ID provided")
+	}
+	
+	return s.repo.GetByID(id)
+}
