@@ -35,9 +35,20 @@ func main() {
 		log.Fatalf(">> FATAL ERROR: Could not run migration \n%v", err)
 	}
 
+	// Repositories
 	genreRepo := repository.NewGenreRepository(db)
+	actorRepo := repository.NewActorRepository(db)
+	movieRepo := repository.NewMovieRepository(db)
+
+	// Services
 	genreService := service.NewGenreService(genreRepo)
+	actorService := service.NewActorService(actorRepo)
+	movieService := service.NewMovieService(movieRepo)
+
+	// Handlers
 	genreHandler := handler.NewGenreHandler(genreService)
+	actorHandler := handler.NewActorHandler(actorService)
+	movieHandler := handler.NewMovieHandler(movieService)
 
 	// fmt.Printf(">> TEST: Genre Repository Call...\n")
 
@@ -104,12 +115,27 @@ func main() {
 	port := ":8080"
 	mux := http.NewServeMux()
 
+	// Genres
 	mux.HandleFunc("GET /health", HealthCheck)
 	mux.HandleFunc("POST /api/genres", genreHandler.Create)
 	mux.HandleFunc("GET /api/genres", genreHandler.GetAll)
 	mux.HandleFunc("GET /api/genres/{id}", genreHandler.GetByID)
 	mux.HandleFunc("PATCH /api/genres/{id}", genreHandler.Update)
 	mux.HandleFunc("DELETE /api/genres/{id}", genreHandler.Delete)
+
+	// Actors
+	mux.HandleFunc("POST /api/actors", actorHandler.Create)
+	mux.HandleFunc("GET /api/actors", actorHandler.GetAll)
+	mux.HandleFunc("GET /api/actors/{id}", actorHandler.GetByID)
+	mux.HandleFunc("PATCH /api/actors/{id}", actorHandler.Update)
+	mux.HandleFunc("DELETE /api/actors/{id}", actorHandler.Delete)
+
+	// Movies
+	mux.HandleFunc("POST /api/movies", movieHandler.Create)
+	mux.HandleFunc("GET /api/movies", movieHandler.GetAll)
+	mux.HandleFunc("GET /api/movies/{id}", movieHandler.GetByID)
+	mux.HandleFunc("PATCH /api/movies/{id}", movieHandler.Update)
+	mux.HandleFunc("DELETE /api/movies/{id}", movieHandler.Delete)
 
 	fmt.Printf(">> Starting Server ...\n")
 	fmt.Printf(">> URL: http://localhost%s\n", port)
