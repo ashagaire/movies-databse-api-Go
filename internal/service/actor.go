@@ -31,7 +31,7 @@ func (s *ActorService) Create(actor *models.Actor) error{
 		return errors.New("birth date must be in YYYY-MM-DD format")
 	}
 
-	err := s.repo.Create(actor)
+	err = s.repo.Create(actor)
 	if err != nil {
 		return fmt.Errorf("failed to create actor: %w", err)
 	}
@@ -44,10 +44,10 @@ func (s *ActorService) GetAll() ([]models.Actor, error) {
 	return s.repo.GetAll()
 }
 
-func (s *ActorService) GetByID(id int64) (models.Actor, error) {
+func (s *ActorService) GetByID(id int64) (*models.Actor, error) {
 	
 	if id <= 0 {
-		return models.Actor{}, errors.New("invalid ID provided")
+		return &models.Actor{}, errors.New("invalid ID provided")
 	}
 
 	return s.repo.GetByID(id)
