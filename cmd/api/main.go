@@ -133,6 +133,10 @@ func main() {
 	// Movies
 	mux.HandleFunc("POST /api/movies", movieHandler.Create)
 	mux.HandleFunc("GET /api/movies", movieHandler.GetAll)
+
+	// IMPORTANT: Keep it above {id} else it will break
+	mux.HandleFunc("GET /api/movies/search", movieHandler.Search)
+
 	mux.HandleFunc("GET /api/movies/{id}", movieHandler.GetByID)
 	mux.HandleFunc("PATCH /api/movies/{id}", movieHandler.Update)
 	mux.HandleFunc("DELETE /api/movies/{id}", movieHandler.Delete)
