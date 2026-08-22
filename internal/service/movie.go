@@ -18,7 +18,7 @@ func NewMovieService(repo *repository.MovieRepository) *MovieService {
 }
 
 func (s *MovieService) Create(movie *models.Movie) error {
-	
+
 	movie.Title = strings.TrimSpace(movie.Title)
 	if movie.Title == "" {
 		return errors.New("movie title cannot be empty")
@@ -41,23 +41,22 @@ func (s *MovieService) Create(movie *models.Movie) error {
 }
 
 func (s *MovieService) GetAll() ([]models.Movie, error) {
-	
+
 	return s.repo.GetAll()
 
 }
 
 func (s *MovieService) GetByID(id int64) (models.Movie, error) {
-	
+
 	if id <= 0 {
 		return models.Movie{}, errors.New("invalid ID provided")
 	}
-	
+
 	return s.repo.GetByID(id)
 }
 
-
 func (s *MovieService) Update(id int64, updateData *models.Movie) error {
-	
+
 	if id <= 0 {
 		return errors.New("invalid ID provided")
 	}
@@ -70,19 +69,19 @@ func (s *MovieService) Update(id int64, updateData *models.Movie) error {
 	if strings.TrimSpace(updateData.Title) != "" {
 		existingMovie.Title = strings.TrimSpace(updateData.Title)
 	}
-	
+
 	if updateData.ReleaseYear > 0 {
 		if updateData.ReleaseYear < 1888 {
 			return errors.New("release year must be 1888 or later")
 		}
-		
+
 		existingMovie.ReleaseYear = updateData.ReleaseYear
 	}
 
 	if updateData.Duration > 0 {
 		existingMovie.Duration = updateData.Duration
 	}
-	
+
 	// For relationships (Genres/Actors), if user provide new list, we replace the old one.
 	if updateData.Genres != nil {
 		existingMovie.Genres = updateData.Genres
@@ -95,7 +94,7 @@ func (s *MovieService) Update(id int64, updateData *models.Movie) error {
 }
 
 func (s *MovieService) Delete(id int64, force bool) error {
-	
+
 	if id <= 0 {
 		return errors.New("invalid ID provided")
 	}
@@ -105,4 +104,13 @@ func (s *MovieService) Delete(id int64, force bool) error {
 	}
 
 	return s.repo.Delete(id)
+}
+
+func (s *MovieService) SearchByTitle(title string) ([]models.Movie, error) {
+	title = strings.TrimSpace(title)
+	if title == "" {
+		return nil, errors.New("search title cannot be empty")
+	}
+
+	return s.repo.SearchByTitle(title)
 }
