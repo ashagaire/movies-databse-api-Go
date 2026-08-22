@@ -90,6 +90,19 @@ func (s *MovieService) Update(id int64, updateData *models.Movie) error {
 	if updateData.Actors != nil {
 		existingMovie.Actors = updateData.Actors
 	}
-	
+
 	return s.repo.Update(&existingMovie)
+}
+
+func (s *MovieService) Delete(id int64, force bool) error {
+	
+	if id <= 0 {
+		return errors.New("invalid ID provided")
+	}
+
+	if force == true {
+		return s.repo.ForceDelete(id)
+	}
+
+	return s.repo.Delete(id)
 }
