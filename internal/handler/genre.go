@@ -112,3 +112,27 @@ func (h *GenreHandler) Update(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Genre updated successfully"))
 }
+
+func (h *GenreHandler) Delete(w http.ResponseWriter, r *http.Request) {
+
+	idStr := r.PathValue("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		http.Error(w, "Invalid ID format", http.StatusBadRequest)
+		return
+	}
+
+	forceStr := r.URL.Query().Get("force")
+	var force bool
+	if forceStr == "true" {
+		force = true
+	}
+
+	err = h.service.Delete(id, force)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
