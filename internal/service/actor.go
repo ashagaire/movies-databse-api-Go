@@ -40,3 +40,13 @@ func (s *ActorService) Create(actor *models.Actor) error{
 func (s *ActorService) GetAll() ([]models.Actor, error) {
 	return s.repo.GetAll()
 }
+
+func (s *ActorService) GetByID(id int64) (models.Actor, error) {
+	
+	if id <= 0 {
+		return models.Actor{}, errors.New("invalid ID provided")
+	}
+
+	return s.repo.GetByID(id)
+
+}
