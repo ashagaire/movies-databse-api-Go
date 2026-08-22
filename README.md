@@ -54,11 +54,31 @@ Ensure Go 1.22+ and a C compiler (required for `go-sqlite3` CGO bindings) are in
 
 The application includes a multi-stage Dockerfile and docker-compose.yml for consistent deployment across environments.
     
-    ```
     docker-compose up --build
+    
+The API will be exposed on http://localhost:8080. The SQLite database file is persisted via a Docker volume in the ./data directory.
+
+
+## Seeding Sample Data
+
+To populate the database with a comprehensive dataset (20 movies, 15 actors, 5 genres, and their relationships ) for testing purposes:
+
+1. Ensure the application has run at least once to generate the movies.db schema.
+2. Execute the provided SQL script against the database:
+    
+    ```Bash
+    sqlite3 ./data/movies.db < ./sql/sample_data.sql
     ```
 
-The API will be exposed on http://localhost:8080. The SQLite database file is persisted via a Docker volume in the ./data directory.
+## Testing
+
+The project includes a comprehensive automated testing suite. Tests are executed against isolated, in-memory SQLite databases (:memory:) to ensure no impact on the local development environment.
+
+To run the unit tests:
+
+    go test ./... -v
+
+
 
 ## Project Structure
 
