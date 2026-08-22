@@ -31,6 +31,7 @@ func (h *GenreHandler) Create(w http.ResponseWriter, r *http.Request) {
 	err = h.service.Create(&genre)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -39,6 +40,7 @@ func (h *GenreHandler) Create(w http.ResponseWriter, r *http.Request) {
 	err = json.NewEncoder(w).Encode(genre)
 	if err != nil {
 		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+		return
 	}
 }
 
@@ -58,6 +60,7 @@ func (h *GenreHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+		return
 	}
 }
 
@@ -83,6 +86,7 @@ func (h *GenreHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	err = json.NewEncoder(w).Encode(genre)
 	if err != nil {
 		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+		return
 	}
 }
 
