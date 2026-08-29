@@ -6,29 +6,28 @@ A high performance, relational REST API built in Go for managing structured movi
 
 This project implements a clean, layered architecture to ensure separation of concerns, maintainability, and testability:
 
-*   **Handler Layer:** Manages HTTP request parsing, routing, and JSON serialization.
-*   **Service Layer:** Encapsulates business logic, data validation, and transactional orchestration.
-*   **Repository Layer:** Interfaces directly with the SQLite database, executing raw SQL queries and managing complex `JOIN` operations.
+- **Handler Layer:** Manages HTTP request parsing, routing, and JSON serialization.
+- **Service Layer:** Encapsulates business logic, data validation, and transactional orchestration.
+- **Repository Layer:** Interfaces directly with the SQLite database, executing raw SQL queries and managing complex `JOIN` operations.
 
 ## Core Capabilities
 
-*   **Relational Data Management:** Full CRUD support for Movies, Actors, and Genres.
-*   **Complex Associations:** Handles Many-to-Many relationships (Movies ↔ Genres, Movies ↔ Actors) via junction tables.
-*   **Dynamic Querying:** 
-    *   Pagination (`?page=0&size=10`)
-    *   Attribute filtering (`?year=1999&genre=1`)
-    *   Case-insensitive partial text search (`/search?title=matrix`)
-*   **Strict Data Integrity:** Enforces `ON DELETE RESTRICT` foreign key constraints at the database level to prevent orphaned records.
-*   **Transactional Operations:** Implements database transactions (`BEGIN`, `COMMIT`, `ROLLBACK`) for multi-table inserts and safe `?force=true` cascading deletions.
+- **Relational Data Management:** Full CRUD support for Movies, Actors, and Genres.
+- **Complex Associations:** Handles Many-to-Many relationships (Movies ↔ Genres, Movies ↔ Actors) via junction tables.
+- **Dynamic Querying:**
+  - Pagination (`?page=0&size=10`)
+  - Attribute filtering (`?year=1999&genre=1`)
+  - Case-insensitive partial text search (`/search?title=matrix`)
+- **Strict Data Integrity:** Enforces `ON DELETE RESTRICT` foreign key constraints at the database level to prevent orphaned records.
+- **Transactional Operations:** Implements database transactions (`BEGIN`, `COMMIT`, `ROLLBACK`) for multi-table inserts and safe `?force=true` cascading deletions.
 
 ## Tech Stack
 
-*   **Language:** Go (1.22+)
-*   **Database:** SQLite3 (`github.com/mattn/go-sqlite3`)
-*   **Routing:** Go Standard Library (`net/http` )
+- **Language:** Go (1.22+)
+- **Database:** SQLite3 (`github.com/mattn/go-sqlite3`)
+- **Routing:** Go Standard Library (`net/http` )
 
 ## Setup and Installation
-
 
 ### Local Development
 
@@ -38,26 +37,46 @@ Ensure Go 1.22+ and a C compiler (required for `go-sqlite3` CGO bindings) are in
    ```bash
    git clone https://gitea.kood.tech/muhammadowaisjaved/movies-api.git
    cd movies-api
-    ```
+   ```
 2. Download dependencies:
-    ```bash
-    go mod tidy
-    ```
 
-3. Run the application:
-    
-    ```bash
-    go run ./cmd/api/main.go
-    ```
+   ```bash
+   go mod tidy
+   ```
+
+3. Database Setup and migration:
+
+   install the Goose CLI:
+
+   ```bash
+   go install github.com/pressly/goose/v3/cmd/goose@latest
+   ```
+
+   Verify the installation:
+
+   ```bash
+   goose -version
+   ```
+
+   Create the database and run migrations:
+
+   ```bash
+   goose -dir migrations sqlite3 ./internal/database/movies.db up
+   ```
+
+4. Run the application:
+
+   ```bash
+   go run ./cmd/api/main.go
+   ```
 
 ## Containerization
 
 The application includes a multi-stage Dockerfile and docker-compose.yml for consistent deployment across environments.
-    
-    docker-compose up --build
-    
-The API will be exposed on http://localhost:8080. The SQLite database file is persisted via a Docker volume in the ./data directory.
 
+    docker-compose up --build
+
+The API will be exposed on http://localhost:8080. The SQLite database file is persisted via a Docker volume in the ./data directory.
 
 ## Seeding Sample Data
 
@@ -65,10 +84,10 @@ To populate the database with a comprehensive dataset (20 movies, 15 actors, 5 g
 
 1. Ensure the application has run at least once to generate the movies.db schema.
 2. Execute the provided SQL script against the database:
-    
-    ```Bash
-    sqlite3 ./data/movies.db < ./sql/sample_data.sql
-    ```
+
+   ```Bash
+   sqlite3 ./data/movies.db < ./sql/sample_data.sql
+   ```
 
 ## Testing
 
