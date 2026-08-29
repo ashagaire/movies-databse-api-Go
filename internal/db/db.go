@@ -9,28 +9,19 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func BuildDb(){
+// Global db variable with an InitDB function\
+// goose -dir migrations sqlite3 ./internal/db/test.db up
+
+func InitDB() (*sql.DB, error){
+	var err error
 	db, err := sql.Open("sqlite3", "../../internal/db/test.db?_foreign_keys=on")
 	if err != nil {
 		log.Fatal(err)
+		return nil, err
 
 	}
-	defer db.Close()
-	
-	
-	_, err = db.Exec(schema)
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Println("Database built sucessfully")
-
-	//seeding demo data
-	seedFile := "seed.sql"
-	err = seedData(db, seedFile)
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Println("Database seeded sucessfully")
+	fmt.Println("database linked sucessfully")
+	return db, nil
 }
 
 func seedData(db *sql.DB, seeDFilePath string) error {
