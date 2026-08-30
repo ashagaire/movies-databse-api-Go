@@ -3,13 +3,13 @@ package main
 import (
 	"fmt"
 	"log"
-	internal "movies-api/internal/db"
+	database "movies-api/internal/database"
 )
 
 func main(){
 
 	fmt.Println("movies-api")
-	db, err:= internal.InitDB()
+	db, err:= database.InitDB()
 	if err != nil {
 		log.Println("Error in database initialization.")
         log.Fatal(err)
