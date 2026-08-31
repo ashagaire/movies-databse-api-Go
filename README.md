@@ -78,17 +78,6 @@ The application includes a multi-stage Dockerfile and docker-compose.yml for con
 
 The API will be exposed on http://localhost:8080. The SQLite database file is persisted via a Docker volume in the ./data directory.
 
-## Seeding Sample Data
-
-To populate the database with a comprehensive dataset (20 movies, 15 actors, 5 genres, and their relationships ) for testing purposes:
-
-1. Ensure the application has run at least once to generate the movies.db schema.
-2. Execute the provided SQL script against the database:
-
-   ```Bash
-   sqlite3 ./data/movies.db < ./sql/sample_data.sql
-   ```
-
 ## Testing
 
 The project includes a comprehensive automated testing suite. Tests are executed against isolated, in-memory SQLite databases (:memory:) to ensure no impact on the local development environment.
@@ -96,6 +85,8 @@ The project includes a comprehensive automated testing suite. Tests are executed
 To run the unit tests:
 
     go test ./... -v
+
+The project also includes Postman collection for basic CRUD apis. You can import the collection file to postman application and test apis and their response status.
 
 ## API Reference
 
@@ -134,12 +125,15 @@ open-movies-db/
 │   ├── repository/           # Raw SQL queries (genre.go, movie.go, actor.go)
 │   ├── service/              # Logic & validation (genre.go, movie.go, actor.go)
 │   └── handler/              # HTTP routing, JSON encoding/decoding (genre.go, movie.go, actor.go)
-├── pkg/
-│   └── errors/               # Custom error definitions (e.g., ErrNotFound)
-├── data/                     # Local folder for the SQLite .db file (ignored in git)
+├── migrations/               # Database Migration files
+│   ├── 20260820220000_initial_schema.sql     # Schema for movieapi database table
+│   └── 20260820230000_seed_data.sql          # Seeding the movie database with sample data
+├── postman/
+│   └── Movie Database API.postman_collection.json   # basic CRUD api collection from Postman application
 ├── Dockerfile
 ├── docker-compose.yml
 ├── go.mod
-└── go.sum
+├── go.sum
+└── README.md
 
 ```
