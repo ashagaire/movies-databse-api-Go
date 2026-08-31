@@ -1,5 +1,5 @@
 # movies-api
-
+![Banner](./static/assets/banner.png)
 A high performance, relational REST API built in Go for managing structured movie metadata. Designed with a strict layered architecture, this API provides a strong foundation for applications requiring complex data relationships, dynamic querying, and strict data integrity.
 
 ## Architecture & Design
@@ -15,8 +15,6 @@ This project implements a clean, layered architecture to ensure separation of co
 - **Relational Data Management:** Full CRUD support for Movies, Actors, and Genres.
 - **Complex Associations:** Handles Many-to-Many relationships (Movies ↔ Genres, Movies ↔ Actors) via junction tables.
 - **Dynamic Querying:**
-  - Pagination (`?page=0&size=10`)
-  - Attribute filtering (`?year=1999&genre=1`)
   - Case-insensitive partial text search (`/search?title=matrix`)
 - **Strict Data Integrity:** Enforces `ON DELETE RESTRICT` foreign key constraints at the database level to prevent orphaned records.
 - **Transactional Operations:** Implements database transactions (`BEGIN`, `COMMIT`, `ROLLBACK`) for multi-table inserts and safe `?force=true` cascading deletions.
@@ -46,10 +44,21 @@ Ensure Go 1.22+ and a C compiler (required for `go-sqlite3` CGO bindings) are in
 
 3. Database Setup and migration:
 
-   install the Goose CLI:
+   install the Goose CLI from the system terminal instead of VSCode/Zed terminal:
 
    ```bash
    go install github.com/pressly/goose/v3/cmd/goose@latest
+   ```
+
+    Ensure your Go binary path is included in your shell environment (PATH):
+
+    ```bash
+    # For Zsh (macOS default / Linux)
+    echo 'export PATH=$PATH:$(go env GOPATH)/bin' >> ~/.zshrc && source ~/.zshrc
+
+
+    # For Bash
+    echo 'export PATH=$PATH:$(go env GOPATH)/bin' >> ~/.bashrc && source ~/.bashrc
    ```
 
    Verify the installation:
@@ -88,6 +97,12 @@ To run the unit tests:
 
 The project also includes Postman collection for basic CRUD apis. You can import the collection file to postman application and test apis and their response status.
 
+## Team
+
+| Syed Najam Ul Hassan Kazmi | [GitHub](https://github.com/Najam-Hassan-Kazmi) | [LinkedIn](https://www.linkedin.com/in/najam-ul-hassan-indie-web-developer/) | <br>
+| Asha Gaire | [GitHub](https://github.com/ashagaire) | [LinkedIn](https://www.linkedin.com/in/asha-gaire-2b532217b/) |<br>
+| Muhammad Owais Javed | [GitHub](https://github.com/muhammad-owais-javed/) | [LinkedIn](https://www.linkedin.com/in/muhammad-owais-javed/) |
+
 ## API Reference
 
 ### Movies
@@ -95,7 +110,7 @@ The project also includes Postman collection for basic CRUD apis. You can import
 | Method   | Endpoint             | Description                                                                  |
 | :------- | :------------------- | :--------------------------------------------------------------------------- |
 | `POST`   | `/api/movies`        | Create a movie and establish actor/genre relationships                       |
-| `GET`    | `/api/movies`        | Retrieve movies (Supports `page`, `size`, `year`, `genre` query params)      |
+| `GET`    | `/api/movies`        | Retrieve movies (Supports `size`, `year`, `genre` query params)      |
 | `GET`    | `/api/movies/search` | Search movies by title (`?title=`)                                           |
 | `GET`    | `/api/movies/{id}`   | Retrieve a specific movie                                                    |
 | `PATCH`  | `/api/movies/{id}`   | Partially update movie attributes or relationships                           |

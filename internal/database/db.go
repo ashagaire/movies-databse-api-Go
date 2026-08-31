@@ -7,14 +7,14 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+// Run goose migration from root folder
 
-// Run goose migration from root folder 
-// goose -dir migrations sqlite3 ./internal/database/movies.db up  
+// goose -dir migrations sqlite3 ./internal/database/movies.db up
 
-func New() (*sql.DB, error){
+func New() (*sql.DB, error) {
 	// make data filder for database
-	
-	db, err := sql.Open("sqlite3","../../internal/database/movies.db?_foreign_keys=on")
+
+	db, err := sql.Open("sqlite3", "./internal/database/movies.db?_foreign_keys=on")
 	if err != nil {
 		return nil, fmt.Errorf("failed to open database: %w", err)
 	}
@@ -27,6 +27,7 @@ func New() (*sql.DB, error){
 	fmt.Println(">> Connection to SQLite Established!")
 	return db, nil
 }
+
 // func New(dbPath string) (*sql.DB, error) {
 
 // 	connectionString := dbPath + "?_foreign_keys=on"
