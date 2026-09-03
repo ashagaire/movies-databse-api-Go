@@ -123,12 +123,12 @@ func (r *GenreRepository) ForceDelete(id int64) error {
 
 	_, err = tx.Exec(`DELETE FROM movie_genres WHERE genre_id = ?`, id)
 	if err != nil {
-		return fmt.Errorf("failed to delete actor relationships: %w", err)
+		return fmt.Errorf("failed to delete genre relationships: %w", err)
 	}
 
 	_, err = tx.Exec(`DELETE FROM genres WHERE id = ?`, id)
 	if err != nil {
-		return fmt.Errorf("failed to delete actor: %w", err)
+		return fmt.Errorf("failed to delete genre: %w", err)
 	}
 
 	if err := tx.Commit(); err != nil {
