@@ -23,12 +23,12 @@ func (r *GenreRepository) Create(genre *models.Genre) error {
 
 	result, err := r.db.Exec(query, genre.Name)
 	if err != nil {
-		fmt.Errorf("failed to enter genre: %w", err)
+		return fmt.Errorf("failed to enter genre: %w", err)
 	}
 
 	id, err := result.LastInsertId()
 	if err != nil {
-		fmt.Errorf("failed to get new ID: %w", err)
+		return fmt.Errorf("failed to get new ID: %w", err)
 	}
 
 	genre.ID = id
