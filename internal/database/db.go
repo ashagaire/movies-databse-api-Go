@@ -11,41 +11,24 @@ import (
 
 // goose -dir migrations sqlite3 ./internal/database/movies.db up
 
-func New() (*sql.DB, error) {
-	// make data filder for database
+func New(dbPath string) (*sql.DB, error) {
 
-	db, err := sql.Open("sqlite3", "./internal/database/movies.db?_foreign_keys=on")
+	connectionString := dbPath + "?_foreign_keys=on"
+
+	db, err := sql.Open("sqlite3", connectionString)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open database: %w", err)
 	}
-	fmt.Println(">> Connection to Database...")
+	fmt.Println(">> Connection to Database ...")
 	err = db.Ping()
 	if err != nil {
 		return nil, fmt.Errorf("failed to ping database: %w", err)
 	}
+
 	fmt.Println(">> PING: Successful!")
 	fmt.Println(">> Connection to SQLite Established!")
 	return db, nil
 }
-
-// func New(dbPath string) (*sql.DB, error) {
-
-// 	connectionString := dbPath + "?_foreign_keys=on"
-
-// 	db, err := sql.Open("sqlite3", connectionString)
-// 	if err != nil {
-// 		return nil, fmt.Errorf("failed to open database: %w", err)
-// 	}
-// 	fmt.Println(">> Connection to Database ...")
-// 	err = db.Ping()
-// 	if err != nil {
-// 		return nil, fmt.Errorf("failed to ping database: %w", err)
-// 	}
-
-// 	fmt.Println(">> PING: Successful!")
-// 	fmt.Println(">> Connection to SQLite Established!")
-// 	return db, nil
-// }
 
 // func RunMigration(db *sql.DB, migrationFilePath string) error {
 
