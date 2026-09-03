@@ -92,9 +92,14 @@ func (r *GenreRepository) GetByID(id int64) (*models.Genre, error) {
 func (r *GenreRepository) Update(genre *models.Genre) error {
 	query := `UPDATE genres SET name = ? WHERE id = ?`
 
-	_, err := r.db.Exec(query, genre.Name, genre.ID)
+	result, err := r.db.Exec(query, genre.Name, genre.ID)
 	if err != nil {
 		return fmt.Errorf("failed to update genre: %w", err)
+	}
+
+	rowsAffected, _ := result.RowsAffected()
+	if rowsAffected == 0 {
+		return fmt.Errorf("genre with ID %d not found", id)
 	}
 
 	return nil
@@ -104,9 +109,14 @@ func (r *GenreRepository) Delete(id int64) error {
 
 	query := `DELETE FROM genres WHERE id = ?`
 
-	_, err := r.db.Exec(query, id)
+	result, err := r.db.Exec(query, id)
 	if err != nil {
 		return fmt.Errorf("failed to delete genre: %w", err)
+	}
+
+	rowsAffected, _ := result.RowsAffected()
+	if rowsAffected == 0 {
+		return fmt.Errorf("genre with ID %d not found", id)
 	}
 
 	return nil
