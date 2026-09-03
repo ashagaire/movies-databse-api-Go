@@ -64,6 +64,7 @@ func (h *MovieHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(movie)
 }
 
+// WIP: PATCH endpoints return HTTP status 200 (OK) and the updated entity
 func (h *MovieHandler) Update(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
 	if err != nil {

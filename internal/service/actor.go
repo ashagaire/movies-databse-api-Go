@@ -1,25 +1,25 @@
 package service
 
 import (
-	"fmt"
-	"strings"
 	"errors"
-	"time"
+	"fmt"
 	"movies-api/internal/models"
 	"movies-api/internal/repository"
+	"strings"
+	"time"
 )
 
-type ActorService struct{
+type ActorService struct {
 	repo *repository.ActorRepository
 }
 
-func NewActorService(repo *repository.ActorRepository) *ActorService{
+func NewActorService(repo *repository.ActorRepository) *ActorService {
 	return &ActorService{
 		repo: repo,
 	}
 }
 
-func (s *ActorService) Create(actor *models.Actor) error{
+func (s *ActorService) Create(actor *models.Actor) error {
 
 	actor.Name = strings.TrimSpace(actor.Name)
 	if actor.Name == "" {
@@ -45,7 +45,7 @@ func (s *ActorService) GetAll() ([]models.Actor, error) {
 }
 
 func (s *ActorService) GetByID(id int64) (*models.Actor, error) {
-	
+
 	if id <= 0 {
 		return &models.Actor{}, errors.New("invalid ID provided")
 	}
@@ -54,6 +54,7 @@ func (s *ActorService) GetByID(id int64) (*models.Actor, error) {
 
 }
 
+// WIP: PATCH endpoints return HTTP status 200 (OK) and the updated entity
 func (s *ActorService) Update(id int64, updateData *models.Actor) error {
 
 	if id <= 0 {
@@ -68,9 +69,9 @@ func (s *ActorService) Update(id int64, updateData *models.Actor) error {
 	if strings.TrimSpace(updateData.Name) != "" {
 		existingActor.Name = strings.TrimSpace(updateData.Name)
 	}
-	
+
 	if updateData.BirthDate != "" {
-		_, err := time.Parse("2006-01-02", updateData.BirthDate) 
+		_, err := time.Parse("2006-01-02", updateData.BirthDate)
 		if err != nil {
 			return errors.New("birth date must be in YYYY-MM-DD format")
 		}
@@ -80,9 +81,8 @@ func (s *ActorService) Update(id int64, updateData *models.Actor) error {
 	return s.repo.Update(existingActor)
 }
 
-
 func (s *ActorService) Delete(id int64, force bool) error {
-	
+
 	if id <= 0 {
 		return errors.New("invalid ID provided")
 	}
@@ -93,3 +93,7 @@ func (s *ActorService) Delete(id int64, force bool) error {
 
 	return s.repo.Delete(id)
 }
+
+//The actor service has a function to get all movies an actor has appeared in
+
+//Ensure GET /api/movies?actor={actorId} returns all movies the specified actor has starred in

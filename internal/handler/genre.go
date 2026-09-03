@@ -90,6 +90,7 @@ func (h *GenreHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// WIP: PATCH endpoints return HTTP status 200 (OK) and the updated entity
 func (h *GenreHandler) Update(w http.ResponseWriter, r *http.Request) {
 
 	idStr := r.PathValue("id")

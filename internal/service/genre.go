@@ -44,6 +44,7 @@ func (s *GenreService) GetByID(id int64) (*models.Genre, error) {
 	return s.repo.GetByID(id)
 }
 
+// WIP: PATCH endpoints return HTTP status 200 (OK) and the updated entity
 func (s *GenreService) Update(genre *models.Genre) error {
 
 	genre.Name = strings.TrimSpace(genre.Name)

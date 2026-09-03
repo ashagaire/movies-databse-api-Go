@@ -20,6 +20,8 @@ func NewMovieRepository(db *sql.DB) *MovieRepository {
 
 func (r *MovieRepository) Create(movie *models.Movie) error {
 
+	//check if movie database has row with coming movie name and same release year
+	//
 	tx, err := r.db.Begin()
 	if err != nil {
 		return fmt.Errorf("failed to begin transaction: %w", err)
@@ -236,6 +238,7 @@ func (r *MovieRepository) GetByID(id int64) (models.Movie, error) {
 	return m, nil
 }
 
+// WIP: PATCH endpoints return HTTP status 200 (OK) and the updated entity
 func (r *MovieRepository) Update(movie *models.Movie) error {
 
 	tx, err := r.db.Begin()
@@ -386,3 +389,6 @@ func (r *MovieRepository) SearchByActor(actor string) ([]models.Movie, error) {
 
 	return movies, nil
 }
+
+// get movies with genrs name
+// The movie repository has a function to find movies by genre ID using SQL queries

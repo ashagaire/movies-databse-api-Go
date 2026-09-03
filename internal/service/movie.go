@@ -58,6 +58,7 @@ func (s *MovieService) GetByID(id int64) (models.Movie, error) {
 	return s.repo.GetByID(id)
 }
 
+// WIP: PATCH endpoints return HTTP status 200 (OK) and the updated entity
 func (s *MovieService) Update(id int64, updateData *models.Movie) error {
 
 	if id <= 0 {
@@ -117,3 +118,9 @@ func (s *MovieService) SearchByTitle(title string) ([]models.Movie, error) {
 
 	return s.repo.SearchByTitle(title)
 }
+
+// Movies can be filtered by release year
+
+// Verify that GET /api/movies?year={releaseYear} returns all movies released in the specified year
+//The movie service includes a function to retrieve movies by genre ID
+// The movie service has a function to get all actors in a specific movie
