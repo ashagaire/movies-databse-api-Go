@@ -77,7 +77,10 @@ func main() {
 	fmt.Printf(">> Starting Server ...\n")
 	fmt.Printf(">> URL: http://localhost%s\n", port)
 
-	err = http.ListenAndServe(port, mux)
+	handlerWithMiddleware := PanicRecoveryMiddleware(mux)
+
+
+	err = http.ListenAndServe(port, handlerWithMiddleware )
 	if err != nil {
 		log.Fatalf(">> FATAL: Server Failed to start! \n%v", err)
 	}
@@ -88,4 +91,25 @@ func HealthCheck(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(">> OK: API Health Check!"))
 	fmt.Printf(">> OK: API Health Check!\n")
+}
+
+
+func PanicRecoveryMiddleware(next http.Handler ) http.Handler {
+	
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request ) {
+		
+		defer func() {
+
+			if err := recover(); err != nil {
+				log.Printf(">> PANIC RECOVERED: %v\n", err)
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusInternalServerError )
+				w.Write([]byte(`{"error": "Internal server error"}`))
+			}
+		}()
+		
+		next.ServeHTTP(w, r)
+
+	})
+
 }
