@@ -1,5 +1,7 @@
 # movies-api
+
 ![Banner](./static/assets/banner.png)
+
 A high performance, relational REST API built in Go for managing structured movie metadata. Designed with a strict layered architecture, this API provides a strong foundation for applications requiring complex data relationships, dynamic querying, and strict data integrity.
 
 ## Architecture & Design
@@ -24,6 +26,10 @@ This project implements a clean, layered architecture to ensure separation of co
 - **Language:** Go (1.22+)
 - **Database:** SQLite3 (`github.com/mattn/go-sqlite3`)
 - **Routing:** Go Standard Library (`net/http` )
+- **Migrations:** Goose
+- **Containerization:** Docker & Docker Compose
+- **Testing:** Go testing with isolated in-memory SQLite databases
+- **API Testing:** Postman or Curl
 
 ## Setup and Installation
 
@@ -91,17 +97,11 @@ The API will be exposed on http://localhost:8080. The SQLite database file is pe
 
 The project includes a comprehensive automated testing suite. Tests are executed against isolated, in-memory SQLite databases (:memory:) to ensure no impact on the local development environment.
 
-To run the unit tests:
+To run the unit tests in the root directory:
 
     go test ./... -v
 
-The project also includes Postman collection for basic CRUD apis. You can import the collection file to postman application and test apis and their response status.
-
-## Team
-
-| Syed Najam Ul Hassan Kazmi | [GitHub](https://github.com/Najam-Hassan-Kazmi) | [LinkedIn](https://www.linkedin.com/in/najam-ul-hassan-indie-web-developer/) | <br>
-| Asha Gaire | [GitHub](https://github.com/ashagaire) | [LinkedIn](https://www.linkedin.com/in/asha-gaire-2b532217b/) |<br>
-| Muhammad Owais Javed | [GitHub](https://github.com/muhammad-owais-javed/) | [LinkedIn](https://www.linkedin.com/in/muhammad-owais-javed/) |
+The project also includes Postman collection for basic CRUD APIs. You can import the collection file to Postman application and test apis and their response status.
 
 ## API Reference
 
@@ -110,7 +110,7 @@ The project also includes Postman collection for basic CRUD apis. You can import
 | Method   | Endpoint             | Description                                                                  |
 | :------- | :------------------- | :--------------------------------------------------------------------------- |
 | `POST`   | `/api/movies`        | Create a movie and establish actor/genre relationships                       |
-| `GET`    | `/api/movies`        | Retrieve movies (Supports `size`, `year`, `genre` query params)      |
+| `GET`    | `/api/movies`        | Retrieve movies (Supports `size`, `year`, `genre` and `actor` query params)  |
 | `GET`    | `/api/movies/search` | Search movies by title (`?title=`)                                           |
 | `GET`    | `/api/movies/{id}`   | Retrieve a specific movie                                                    |
 | `PATCH`  | `/api/movies/{id}`   | Partially update movie attributes or relationships                           |
@@ -248,26 +248,62 @@ curl -X DELETE "http://localhost:8080/api/genres/1?force=true"
 ## Project Structure
 
 ```text
-
 movies-api/
 ├── cmd/
 │   └── api/
-│       └── main.go           # Entry point: wires up dependencies and starts the server
-├── internal/
-│   ├── models/               # Struct definitions (Movie, Actor, Genre)
-│   ├── database/             # SQLite connection setup (db.go)
-│   ├── repository/           # Raw SQL queries (genre.go, movie.go, actor.go)
-│   ├── service/              # Logic & validation (genre.go, movie.go, actor.go)
-│   └── handler/              # HTTP routing, JSON encoding/decoding (genre.go, movie.go, actor.go)
-├── migrations/               # Database Migration files
-│   ├── 20260820220000_initial_schema.sql     # Schema for movieapi database table
-│   └── 20260820230000_seed_data.sql          # Seeding the movie database with sample data
-├── postman/
-│   └── Movie Database API.postman_collection.json   # basic CRUD api collection from Postman application
-├── Dockerfile
+│       └── main.go
+├── data/
 ├── docker-compose.yml
+├── Dockerfile
 ├── go.mod
 ├── go.sum
+├── internal/
+│   ├── database/
+│   │   ├── db.go
+│   │   └── movies.db
+│   ├── handler/
+│   │   ├── actor.go
+│   │   ├── error_handler.go
+│   │   ├── genre.go
+│   │   └── movie.go
+│   ├── models/
+│   │   ├── errors/
+│   │   │   └── errors.go
+│   │   ├── models.go
+│   │   └── query.go
+│   ├── repository/
+│   │   ├── actor.go
+│   │   ├── actor_test.go
+│   │   ├── genre.go
+│   │   ├── genre_test.go
+│   │   ├── movie.go
+│   │   ├── movie_test.go
+│   │   └── shared_test.go
+│   └── service/
+│       ├── actor.go
+│       ├── actor_test.go
+│       ├── genre.go
+│       ├── movie.go
+│       └── movie_test.go
+├── migrations/
+│   ├── 20260820220000_initial_schema.sql
+│   └── 20260820230000_seed_data.sql
+├── postman/
+│   └── Movie Database API.postman_collection.json
+├── static/
+│   └── assets/
+│       └── banner.png
 └── README.md
-
 ```
+
+## Team
+
+| Name | ⬇ | ⬇ |
+|---|---|---|
+| Muhammad Owais Javed[Lead] | [GitHub](https://github.com/muhammad-owais-javed/) | [LinkedIn](https://www.linkedin.com/in/muhammad-owais-javed/) |
+| Asha Gaire | [GitHub](https://github.com/ashagaire) | [LinkedIn](https://www.linkedin.com/in/asha-gaire-2b532217b/) |
+| Syed Najam Ul Hassan Kazmi | [GitHub](https://github.com/Najam-Hassan-Kazmi) | [LinkedIn](https://www.linkedin.com/in/najam-ul-hassan-indie-web-developer/) |
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
