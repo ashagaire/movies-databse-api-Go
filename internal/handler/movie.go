@@ -35,15 +35,55 @@ func (h *MovieHandler) Create(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *MovieHandler) GetAll(w http.ResponseWriter, r *http.Request) {
-	movies, err := h.service.GetAll()
+	
+	var movies []models.Movie
+	var err error
+	
+
+	genreIDStr := r.URL.Query().Get("genre")
+	yearStr := r.URL.Query().Get("year")
+	actorIDStr := r.URL.Query().Get("actor")
+
+
+	// movies, err := h.service.GetAll()
+	// if err != nil {
+	// 	http.Error(w, "Failed to fetch movies", http.StatusInternalServerError)
+	// 	return
+	// }
+
+
+	if genreIDStr != "" {
+
+		genreID, _ := strconv.ParseInt(genreIDStr, 10, 64)
+		movies, err = h.service.GetByGenreID(genreID)
+	
+	} else if yearStr != "" {
+	
+		year, _ := strconv.Atoi(yearStr)
+		movies, err = h.service.GetByReleaseYear(year)
+	
+	} else if actorIDStr != "" {
+	
+		actorID, _ := strconv.ParseInt(actorIDStr, 10, 64)
+		movies, err = h.service.GetByActorID(actorID)
+	
+	} else {
+		// Default: fetch all movies
+	
+		movies, err = h.service.GetAll()
+	
+	}
+
 	if err != nil {
-		http.Error(w, "Failed to fetch movies", http.StatusInternalServerError)
+		http.Error(w, err.Error( ), http.StatusInternalServerError )
 		return
 	}
+
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(movies)
+
 }
 
 func (h *MovieHandler) GetByID(w http.ResponseWriter, r *http.Request) {
@@ -116,4 +156,26 @@ func (h *MovieHandler) Search(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(movies)
+}
+
+
+func (h *MovieHandler) GetActors(w http.ResponseWriter, r *http.Request ) {
+
+	id, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
+
+	if err != nil {
+		http.Error(w, "Invalid ID format", http.StatusBadRequest )
+		return
+	}
+
+	movie, err := h.service.GetByID(id)
+	if err != nil {
+		http.Error(w, err.Error( ), http.StatusNotFound )
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK )
+	json.NewEncoder(w).Encode(movie.Actors)
+
 }
