@@ -105,8 +105,17 @@ func (h *ActorHandler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	updatedActor, err := h.service.GetByID(id)
+	if err != nil {
+		http.Error(w, "Failed to fetch updated actor", http.StatusInternalServerError )
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Actor updated successfully"))
+	w.Write([]byte("Actor updated successfully\n"))
+	json.NewEncoder(w).Encode(updatedActor)
+
 }
 
 func (h *ActorHandler) Delete(w http.ResponseWriter, r *http.Request) {
