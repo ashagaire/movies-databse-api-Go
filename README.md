@@ -126,11 +126,130 @@ The project also includes Postman collection for basic CRUD apis. You can import
 | `PATCH`  | `/api/genres/{id}` or `/api/actors/{id}` | Partially update an entity                |
 | `DELETE` | `/api/genres/{id}` or `/api/actors/{id}` | Delete an entity (Supports `?force=true`) |
 
+
+## Usage & Payload Examples
+
+Below are examples of how to interact with the API using curl. You can use these JSON payloads in Postman as well.
+
+### 1. Genres
+
+Create a Genre:
+
+```Bash
+curl -X POST http://localhost:8080/api/genres \
+-H "Content-Type: application/json" \
+-d '{
+  "name": "Action"
+}'
+```
+
+Update a Genre (PATCH ):
+
+```Bash
+curl -X PATCH http://localhost:8080/api/genres/1 \
+-H "Content-Type: application/json" \
+-d '{
+  "name": "Action & Adventure"
+}'
+```
+
+### 2. Actors
+
+Create an Actor:
+
+_(Note: birthDate must strictly follow the ISO 8601 YYYY-MM-DD format )_
+
+```Bash
+curl -X POST http://localhost:8080/api/actors \
+-H "Content-Type: application/json" \
+-d '{
+  "name": "Leonardo DiCaprio",
+  "birthDate": "1974-11-11"
+}'
+```
+
+Update an Actor (PATCH ):
+
+```Bash
+curl -X PATCH http://localhost:8080/api/actors/1 \
+-H "Content-Type: application/json" \
+-d '{
+  "name": "Leo DiCaprio"
+}'
+```
+
+### 3. Movies
+
+Create a Movie with Relationships:
+
+_(Note: The genres and actors arrays expect objects containing the id of existing records )_
+
+```Bash
+curl -X POST http://localhost:8080/api/movies \
+-H "Content-Type: application/json" \
+-d '{
+  "title": "Inception",
+  "releaseYear": 2010,
+  "duration": 148,
+  "genres": [{"id": 1}, {"id": 2}],
+  "actors": [{"id": 1}, {"id": 3}]
+}'
+```
+
+Update a Movie (PATCH ):
+
+_(You can send just one field, or multiple. Providing a new array for relationships will overwrite the old ones)_
+
+```Bash
+curl -X PATCH http://localhost:8080/api/movies/1 \
+-H "Content-Type: application/json" \
+-d '{
+  "duration": 150,
+  "actors": [{"id": 1}]
+}'
+```
+
+### 4. Filtering & Searching (GET )
+
+The API supports dynamic querying via URL parameters.
+
+Search by Partial Name/Title:
+
+```Bash
+curl -X GET "http://localhost:8080/api/movies/search?title=incept"
+curl -X GET "http://localhost:8080/api/actors?name=Leo"
+```
+
+Filter Movies by Relationships or Year:
+
+```Bash
+curl -X GET "http://localhost:8080/api/movies?genre=1"
+curl -X GET "http://localhost:8080/api/movies?actor=3"
+curl -X GET "http://localhost:8080/api/movies?year=2010"
+```
+
+### 5. Deletions & Constraints
+
+By default, deleting an entity with existing relationships will return a 400 Bad Request to protect data integrity.
+
+Standard Delete (Will fail if relationships exist ):
+
+```Bash
+curl -X DELETE http://localhost:8080/api/genres/1
+```
+
+Force Delete (Cascades and removes relationships ):
+
+```Bash
+curl -X DELETE "http://localhost:8080/api/genres/1?force=true"
+```
+
+
 ## Project Structure
 
 ```text
 
-open-movies-db/
+movies-api/
 ├── cmd/
 │   └── api/
 │       └── main.go           # Entry point: wires up dependencies and starts the server
