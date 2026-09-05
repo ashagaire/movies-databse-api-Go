@@ -141,7 +141,7 @@ func (r *GenreRepository) Update(genre *models.Genre) error {
 
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
-		return fmt.Errorf("genre with ID %d not found", id)
+		return fmt.Errorf("genre with ID %d not found", genre.ID)
 	}
 
 	return nil
