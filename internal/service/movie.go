@@ -117,3 +117,24 @@ func (s *MovieService) SearchByTitle(title string) ([]models.Movie, error) {
 
 	return s.repo.SearchByTitle(title)
 }
+
+func (s *MovieService) GetByActorID(actorID int64) ([]models.Movie, error) {
+	if actorID <= 0 {
+		return nil, errors.New("invalid actor ID provided")
+	}
+	return s.repo.GetByActorID(actorID)
+}
+
+func (s *MovieService) GetByGenreID(genreID int64) ([]models.Movie, error) {
+	if genreID <= 0 {
+		return nil, errors.New("invalid genre ID provided")
+	}
+	return s.repo.GetByGenreID(genreID)
+}
+
+func (s *MovieService) GetByReleaseYear(year int) ([]models.Movie, error) {
+	if year < 1888 {
+		return nil, errors.New("release year must be 1888 or later")
+	}
+	return s.repo.GetByReleaseYear(year)
+}
