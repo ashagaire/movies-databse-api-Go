@@ -359,33 +359,33 @@ func (r *MovieRepository) SearchByTitle(title string) ([]models.Movie, error) {
 	return movies, nil
 }
 
-func (r *MovieRepository) SearchByActor(actor string) ([]models.Movie, error) {
+// func (r *MovieRepository) SearchByActor(actor string) ([]models.Movie, error) {
 
-	query := `SELECT id, title, release_year, duration FROM movies WHERE actor LIKE ?`
+// 	query := `SELECT id, title, release_year, duration FROM movies WHERE actor LIKE ?`
 
-	searchPattern := "%" + actor + "%"
+// 	searchPattern := "%" + actor + "%"
 
-	rows, err := r.db.Query(query, searchPattern)
-	if err != nil {
-		return nil, fmt.Errorf("failed to search movies: %w", err)
-	}
-	defer rows.Close()
+// 	rows, err := r.db.Query(query, searchPattern)
+// 	if err != nil {
+// 		return nil, fmt.Errorf("failed to search movies: %w", err)
+// 	}
+// 	defer rows.Close()
 
-	var movies []models.Movie
-	for rows.Next() {
-		var m models.Movie
-		err := rows.Scan(&m.ID, &m.Title, &m.ReleaseYear, &m.Duration)
-		if err != nil {
-			return nil, fmt.Errorf("failed to scan movie: %w", err)
-		}
+// 	var movies []models.Movie
+// 	for rows.Next() {
+// 		var m models.Movie
+// 		err := rows.Scan(&m.ID, &m.Title, &m.ReleaseYear, &m.Duration)
+// 		if err != nil {
+// 			return nil, fmt.Errorf("failed to scan movie: %w", err)
+// 		}
 
-		m.Genres = []models.Genre{}
-		m.Actors = []models.Actor{}
-		movies = append(movies, m)
-	}
+// 		m.Genres = []models.Genre{}
+// 		m.Actors = []models.Actor{}
+// 		movies = append(movies, m)
+// 	}
 
-	return movies, nil
-}
+// 	return movies, nil
+// }
 
 
 func (r *MovieRepository) GetByActorID(actorID int64) ([]models.Movie, error) {
