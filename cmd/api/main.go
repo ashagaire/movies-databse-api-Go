@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-
+	"os"
 	"movies-api/internal/database"
 	"movies-api/internal/handler"
 	"movies-api/internal/repository"
@@ -15,7 +15,13 @@ func main() {
 
 	fmt.Println("movies-api")
 
-	db, err := database.New()
+	err := os.MkdirAll("./internal/database/", 0755)
+	if err != nil {
+		log.Fatalf(">> FATAL ERROR: Failed to create directory \n%v", err)
+	}
+
+	dbPath := "./internal/database/movies.db"
+	db, err := database.New(dbPath)
 	if err != nil {
 		log.Fatalf(">> ERROR: %v", err)
 	}
