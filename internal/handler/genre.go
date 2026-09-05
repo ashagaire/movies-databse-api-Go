@@ -48,7 +48,7 @@ func (h *GenreHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 
 	name := r.URL.Query().Get("name")
 	
-	var actors []models.Actor
+	var genres []models.Genre
 	var err error
 
 	// genres, err := h.service.GetAll()
@@ -60,16 +60,16 @@ func (h *GenreHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 
 	if name != "" {
 
-		actors, err = h.service.GetByName(name)
+		genres, err = h.service.GetByName(name)
 	
 	} else {
 		
-		actors, err = h.service.GetAll()
+		genres, err = h.service.GetAll()
 	
 	}
 
 	if err != nil {
-		http.Error(w, "Failed to fetch actors", http.StatusInternalServerError )
+		http.Error(w, "Failed to fetch genres", http.StatusInternalServerError )
 		return
 	}
 
