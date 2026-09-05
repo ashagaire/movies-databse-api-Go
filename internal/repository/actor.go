@@ -129,10 +129,15 @@ func (r *ActorRepository) GetByName(name string) ([]models.Actor, error) {
 func (r *ActorRepository) Update(actor *models.Actor) error{
 
 	query := `UPDATE actors SET name = ?, birth_date = ? WHERE id = ?`
-	_, err := r.db.Exec(query, actor.Name, actor.BirthDate, actor.ID)
+	result, err := r.db.Exec(query, actor.Name, actor.BirthDate, actor.ID)
 
 	if err != nil {
 		return fmt.Errorf("failed to update actor: %w", err)
+	}
+
+	rowsAffected, _ := result.RowsAffected()
+	if rowsAffected == 0 {
+		return fmt.Errorf("actor with ID %d not found", actor.ID) 
 	}
 
 	return nil
@@ -143,9 +148,14 @@ func (r *ActorRepository) Update(actor *models.Actor) error{
 func (r *ActorRepository) Delete(id int64) error{
 
 	query := `DELETE FROM actors WHERE id = ?`
-	_, err := r.db.Exec(query, id)
+	result, err := r.db.Exec(query, id)
 	if err != nil {
 		return fmt.Errorf("failed to delete actor: %w", err)
+	}
+
+	rowsAffected, _ := result.RowsAffected()
+	if rowsAffected == 0 {
+		return fmt.Errorf("actor with ID %d not found", id) 
 	}
 
 	return nil
