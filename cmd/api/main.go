@@ -64,7 +64,6 @@ func main() {
 	// Movies
 	mux.HandleFunc("POST /api/movies", movieHandler.Create)
 	mux.HandleFunc("GET /api/movies", movieHandler.GetAll)
-	mux.HandleFunc("GET /api/movies/search", movieHandler.Search)
 	mux.HandleFunc("GET /api/movies/{id}", movieHandler.GetByID)
 
 	// IMPORTANT: Keep it above {id} else it will break
