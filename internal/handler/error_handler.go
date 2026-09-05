@@ -5,7 +5,7 @@ import (
 	"errors"
 	"net/http"
 
-	"movies-api/internal/models"
+	"movies-api/internal/models/errors"
  )
 
 type ErrorResponse struct {
