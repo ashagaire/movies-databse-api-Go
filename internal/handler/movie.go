@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -20,12 +21,15 @@ func NewMovieHandler(service *service.MovieService) *MovieHandler {
 func (h *MovieHandler) Create(w http.ResponseWriter, r *http.Request) {
 	var movie models.Movie
 	if err := json.NewDecoder(r.Body).Decode(&movie); err != nil {
-		http.Error(w, "Invalid JSON payload", http.StatusBadRequest)
+		// http.Error(w, "Invalid JSON payload", http.StatusBadRequest)
+		fmt.Println("Invalid JSON payload")
+		HandleError(w, "Invalid JSON payload", err)
 		return
 	}
 
 	if err := h.service.Create(&movie); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		// http.Error(w, err.Error(), http.StatusBadRequest)
+		HandleError(w, "", err)
 		return
 	}
 
@@ -35,15 +39,13 @@ func (h *MovieHandler) Create(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *MovieHandler) GetAll(w http.ResponseWriter, r *http.Request) {
-	
+
 	var movies []models.Movie
 	var err error
-	
 
 	genreIDStr := r.URL.Query().Get("genre")
 	yearStr := r.URL.Query().Get("year")
 	actorIDStr := r.URL.Query().Get("actor")
-
 
 	// movies, err := h.service.GetAll()
 	// if err != nil {
@@ -51,34 +53,33 @@ func (h *MovieHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	// 	return
 	// }
 
-
 	if genreIDStr != "" {
 
 		genreID, _ := strconv.ParseInt(genreIDStr, 10, 64)
 		movies, err = h.service.GetByGenreID(genreID)
-	
+
 	} else if yearStr != "" {
-	
+
 		year, _ := strconv.Atoi(yearStr)
 		movies, err = h.service.GetByReleaseYear(year)
-	
+
 	} else if actorIDStr != "" {
-	
+
 		actorID, _ := strconv.ParseInt(actorIDStr, 10, 64)
 		movies, err = h.service.GetByActorID(actorID)
-	
+
 	} else {
 		// Default: fetch all movies
-	
+
 		movies, err = h.service.GetAll()
-	
+
 	}
 
 	if err != nil {
-		http.Error(w, err.Error( ), http.StatusInternalServerError )
+		// http.Error(w, err.Error( ), http.StatusInternalServerError )
+		HandleError(w, "", err)
 		return
 	}
-
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
@@ -89,13 +90,16 @@ func (h *MovieHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 func (h *MovieHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
 	if err != nil {
-		http.Error(w, "Invalid ID format", http.StatusBadRequest)
+		// http.Error(w, "Invalid ID format", http.StatusBadRequest)
+		fmt.Println("Invalid ID format")
+		HandleError(w, "Invalid ID format", err)
 		return
 	}
 
 	movie, err := h.service.GetByID(id)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusNotFound)
+		// http.Error(w, err.Error(), http.StatusNotFound)
+		HandleError(w, "", err)
 		return
 	}
 
@@ -107,24 +111,31 @@ func (h *MovieHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 func (h *MovieHandler) Update(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
 	if err != nil {
-		http.Error(w, "Invalid ID format", http.StatusBadRequest)
+		// http.Error(w, "Invalid ID format", http.StatusBadRequest)
+		fmt.Println("Invalid ID format")
+		HandleError(w, "Invalid ID format", err)
 		return
 	}
 
 	var movie models.Movie
 	if err := json.NewDecoder(r.Body).Decode(&movie); err != nil {
-		http.Error(w, "Invalid JSON payload", http.StatusBadRequest)
+		// http.Error(w, "Invalid JSON payload", http.StatusBadRequest)
+		fmt.Println("Invalid JSON payload")
+		HandleError(w, "Invalid JSON payload", err)
 		return
 	}
 
 	if err := h.service.Update(id, &movie); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		// http.Error(w, err.Error(), http.StatusBadRequest)
+		HandleError(w, "", err)
 		return
 	}
 
 	updatedMovie, err := h.service.GetByID(id)
 	if err != nil {
-		http.Error(w, "Failed to fetch updated movie", http.StatusInternalServerError )
+		// http.Error(w, "Failed to fetch updated movie", http.StatusInternalServerError )
+		fmt.Println("Failed to fetch updated movie")
+		HandleError(w, "Failed to fetch updated movie", err)
 		return
 	}
 
@@ -137,14 +148,17 @@ func (h *MovieHandler) Update(w http.ResponseWriter, r *http.Request) {
 func (h *MovieHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
 	if err != nil {
-		http.Error(w, "Invalid ID format", http.StatusBadRequest)
+		// http.Error(w, "Invalid ID format", http.StatusBadRequest)
+		fmt.Println("Invalid ID format")
+		HandleError(w, "Invalid ID format", err)
 		return
 	}
 
 	force := r.URL.Query().Get("force") == "true"
 
 	if err := h.service.Delete(id, force); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		// http.Error(w, err.Error(), http.StatusBadRequest)
+		HandleError(w, "", err)
 		return
 	}
 
@@ -157,7 +171,8 @@ func (h *MovieHandler) Search(w http.ResponseWriter, r *http.Request) {
 
 	movies, err := h.service.SearchByTitle(title)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		// http.Error(w, err.Error(), http.StatusBadRequest)
+		HandleError(w, "", err)
 		return
 	}
 
@@ -166,24 +181,26 @@ func (h *MovieHandler) Search(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(movies)
 }
 
-
-func (h *MovieHandler) GetActors(w http.ResponseWriter, r *http.Request ) {
+func (h *MovieHandler) GetActors(w http.ResponseWriter, r *http.Request) {
 
 	id, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
 
 	if err != nil {
-		http.Error(w, "Invalid ID format", http.StatusBadRequest )
+		// http.Error(w, "Invalid ID format", http.StatusBadRequest )
+		fmt.Println("Invalid ID format")
+		HandleError(w, "Invalid ID format", err)
 		return
 	}
 
 	movie, err := h.service.GetByID(id)
 	if err != nil {
-		http.Error(w, err.Error( ), http.StatusNotFound )
+		// http.Error(w, err.Error( ), http.StatusNotFound )
+		HandleError(w, "", err)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK )
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(movie.Actors)
 
 }

@@ -1,9 +1,9 @@
 package repository
 
 import (
-	"fmt"
-	"errors"
 	"database/sql"
+	"errors"
+	"fmt"
 	"movies-api/internal/models"
 )
 
@@ -11,13 +11,13 @@ type ActorRepository struct {
 	db *sql.DB
 }
 
-func NewActorRepository(db *sql.DB) *ActorRepository{
+func NewActorRepository(db *sql.DB) *ActorRepository {
 	return &ActorRepository{
 		db: db,
 	}
 }
 
-func (r *ActorRepository) Create(actor *models.Actor) error{
+func (r *ActorRepository) Create(actor *models.Actor) error {
 
 	query := `INSERT INTO actors (name, birth_date) VALUES (?, ?)`
 
@@ -36,7 +36,7 @@ func (r *ActorRepository) Create(actor *models.Actor) error{
 	return nil
 }
 
-func (r *ActorRepository) GetAll()([]models.Actor, error){
+func (r *ActorRepository) GetAll() ([]models.Actor, error) {
 
 	query := `SELECT id, name, birth_date FROM actors`
 
@@ -48,9 +48,9 @@ func (r *ActorRepository) GetAll()([]models.Actor, error){
 	defer rows.Close()
 
 	var actors []models.Actor
-	
-	for rows.Next(){
-		
+
+	for rows.Next() {
+
 		var a models.Actor
 
 		err := rows.Scan(&a.ID, &a.Name, &a.BirthDate)
@@ -60,8 +60,8 @@ func (r *ActorRepository) GetAll()([]models.Actor, error){
 
 		actors = append(actors, a)
 	}
-	
-	err = rows.Err();
+
+	err = rows.Err()
 	if err != nil {
 		return nil, fmt.Errorf("row iteration error: %w", err)
 	}
@@ -75,7 +75,7 @@ func (r *ActorRepository) GetByID(id int64) (*models.Actor, error) {
 
 	var a models.Actor
 
-	err := r.db.QueryRow(query,id).Scan(&a.ID, &a.Name, &a.BirthDate)
+	err := r.db.QueryRow(query, id).Scan(&a.ID, &a.Name, &a.BirthDate)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, fmt.Errorf("actor with ID %d not found", id)
@@ -87,11 +87,10 @@ func (r *ActorRepository) GetByID(id int64) (*models.Actor, error) {
 
 }
 
-
 func (r *ActorRepository) GetByName(name string) ([]models.Actor, error) {
-	
+
 	query := `SELECT id, name, birth_date FROM actors WHERE name LIKE ?`
-	
+
 	searchPattern := "%" + name + "%"
 
 	rows, err := r.db.Query(query, searchPattern)
@@ -126,7 +125,7 @@ func (r *ActorRepository) GetByName(name string) ([]models.Actor, error) {
 	return actors, nil
 }
 
-func (r *ActorRepository) Update(actor *models.Actor) error{
+func (r *ActorRepository) Update(actor *models.Actor) error {
 
 	query := `UPDATE actors SET name = ?, birth_date = ? WHERE id = ?`
 	result, err := r.db.Exec(query, actor.Name, actor.BirthDate, actor.ID)
@@ -137,15 +136,14 @@ func (r *ActorRepository) Update(actor *models.Actor) error{
 
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
-		return fmt.Errorf("actor with ID %d not found", actor.ID) 
+		return fmt.Errorf("actor with ID %d not found", actor.ID)
 	}
 
 	return nil
 
 }
 
-
-func (r *ActorRepository) Delete(id int64) error{
+func (r *ActorRepository) Delete(id int64) error {
 
 	query := `DELETE FROM actors WHERE id = ?`
 	result, err := r.db.Exec(query, id)
@@ -155,13 +153,13 @@ func (r *ActorRepository) Delete(id int64) error{
 
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected == 0 {
-		return fmt.Errorf("actor with ID %d not found", id) 
+		return fmt.Errorf("actor with ID %d not found", id)
 	}
 
 	return nil
 }
 
-func (r *ActorRepository) ForceDelete(id int64) error{
+func (r *ActorRepository) ForceDelete(id int64) error {
 
 	tx, err := r.db.Begin()
 	if err != nil {
@@ -185,6 +183,4 @@ func (r *ActorRepository) ForceDelete(id int64) error{
 
 	return nil
 
-
 }
-

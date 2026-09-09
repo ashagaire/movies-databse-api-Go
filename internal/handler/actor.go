@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -18,14 +19,21 @@ func NewActorHandler(service *service.ActorService) *ActorHandler {
 }
 
 func (h *ActorHandler) Create(w http.ResponseWriter, r *http.Request) {
+
+	decoder := json.NewDecoder(r.Body)
+	decoder.DisallowUnknownFields()
+
 	var actor models.Actor
-	if err := json.NewDecoder(r.Body).Decode(&actor); err != nil {
-		http.Error(w, "Invalid JSON payload", http.StatusBadRequest)
+	if err := decoder.Decode(&actor); err != nil {
+		// http.Error(w, "Invalid JSON payload", http.StatusBadRequest)
+		fmt.Println("Invalid JSON payload")
+		HandleError(w, "Invalid JSON payload", err)
 		return
 	}
 
 	if err := h.service.Create(&actor); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		// http.Error(w, err.Error(), http.StatusBadRequest)
+		HandleError(w, "", err)
 		return
 	}
 
@@ -35,32 +43,32 @@ func (h *ActorHandler) Create(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *ActorHandler) GetAll(w http.ResponseWriter, r *http.Request) {
-	
-	
+
 	name := r.URL.Query().Get("name")
-	
+
 	var actors []models.Actor
 	var err error
-	
+
 	// actors, err := h.service.GetAll()
 	// if err != nil {
 	// 	http.Error(w, "Failed to fetch actors", http.StatusInternalServerError)
 	// 	return
 	// }
 
-
 	if name != "" {
 
 		actors, err = h.service.GetByName(name)
-	
+
 	} else {
-		
+
 		actors, err = h.service.GetAll()
-	
+
 	}
 
 	if err != nil {
-		http.Error(w, "Failed to fetch actors", http.StatusInternalServerError )
+		// http.Error(w, "Failed to fetch actors", http.StatusInternalServerError)
+		fmt.Println("Failed to fetch actors")
+		HandleError(w, "Failed to fetch actors", err)
 		return
 	}
 
@@ -72,13 +80,16 @@ func (h *ActorHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 func (h *ActorHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
 	if err != nil {
-		http.Error(w, "Invalid ID format", http.StatusBadRequest)
+		// http.Error(w, "Invalid ID format", http.StatusBadRequest)
+		fmt.Println("Invalid ID format")
+		HandleError(w, "Invalid ID format", err)
 		return
 	}
 
 	actor, err := h.service.GetByID(id)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusNotFound)
+		// http.Error(w, err.Error(), http.StatusNotFound)
+		HandleError(w, "", err)
 		return
 	}
 
@@ -90,24 +101,31 @@ func (h *ActorHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 func (h *ActorHandler) Update(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
 	if err != nil {
-		http.Error(w, "Invalid ID format", http.StatusBadRequest)
+		// http.Error(w, "Invalid ID format", http.StatusBadRequest)
+		fmt.Println("Invalid ID format")
+		HandleError(w, "Invalid ID format", err)
 		return
 	}
 
 	var actor models.Actor
 	if err := json.NewDecoder(r.Body).Decode(&actor); err != nil {
-		http.Error(w, "Invalid JSON payload", http.StatusBadRequest)
+		// http.Error(w, "Invalid JSON payload", http.StatusBadRequest)
+		fmt.Println("Invalid JSON payload")
+		HandleError(w, "Invalid JSON payload", err)
 		return
 	}
 
 	if err := h.service.Update(id, &actor); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		// http.Error(w, err.Error(), http.StatusBadRequest)
+		HandleError(w, "", err)
 		return
 	}
 
 	updatedActor, err := h.service.GetByID(id)
 	if err != nil {
-		http.Error(w, "Failed to fetch updated actor", http.StatusInternalServerError )
+		// http.Error(w, "Failed to fetch updated actor", http.StatusInternalServerError)
+		fmt.Println("Failed to fetch updated actor")
+		HandleError(w, "Failed to fetch updated actor", err)
 		return
 	}
 
@@ -121,14 +139,17 @@ func (h *ActorHandler) Update(w http.ResponseWriter, r *http.Request) {
 func (h *ActorHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
 	if err != nil {
-		http.Error(w, "Invalid ID format", http.StatusBadRequest)
+		// http.Error(w, "Invalid ID format", http.StatusBadRequest)
+		fmt.Println("Invalid ID format")
+		HandleError(w, "Invalid ID format", err)
 		return
 	}
 
 	force := r.URL.Query().Get("force") == "true"
 
 	if err := h.service.Delete(id, force); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		// http.Error(w, err.Error(), http.StatusBadRequest)
+		HandleError(w, "", err)
 		return
 	}
 

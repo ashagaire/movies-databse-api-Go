@@ -1,15 +1,15 @@
 package repository
 
 import (
-	"testing"
 	"movies-api/internal/models"
+	"testing"
 
 	_ "github.com/mattn/go-sqlite3"
 )
 
 // // setupTestDB creates in-memory database for our tests.
 // func setupTestDB(t *testing.T) *sql.DB {
-	
+
 // 	// ":memory:" To create a temporary database in RAM
 // 	db, err := sql.Open("sqlite3", ":memory:")
 // 	if err != nil {
@@ -22,7 +22,7 @@ import (
 // 		name TEXT NOT NULL,
 // 		birth_date TEXT NOT NULL
 // 	);`
-	
+
 // 	_, err = db.Exec(schema)
 // 	if err != nil {
 // 		t.Fatalf("Failed to create test schema: %v", err)
@@ -31,9 +31,8 @@ import (
 // 	return db
 // }
 
-
 func TestActorRepository_Create(t *testing.T) {
-	
+
 	db := setupTestDB(t)
 	defer db.Close()
 
